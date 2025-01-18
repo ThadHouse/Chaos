@@ -1,15 +1,21 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.I2C.Port;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.OctoQuad.EncoderData;
 
+@Logged
 public class OctoQuadEncoders {
+    @NotLogged
     private final OctoQuad m_octoQuad = new OctoQuad(Port.kOnboard);
 
+    @NotLogged
     private final EncoderData m_encoderData = new EncoderData();
 
     public OctoQuadEncoders() {
+        m_octoQuad.resetAllPositions();
         m_octoQuad.setDirection(0, true);
         m_octoQuad.setDirection(1, true);
     }
@@ -19,11 +25,11 @@ public class OctoQuadEncoders {
     }
 
     public double getFrontLeftPosition() {
-        return m_encoderData.positions[0] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.positions[3] * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getFrontRightPosition() {
-        return m_encoderData.positions[1] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.positions[0] * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getRearLeftPosition() {
@@ -31,15 +37,15 @@ public class OctoQuadEncoders {
     }
 
     public double getRearRightPosition() {
-        return m_encoderData.positions[3] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.positions[1] * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getFrontLeftRate() {
-        return m_encoderData.velocities[0] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[3] * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getFrontRightRate() {
-        return m_encoderData.velocities[1] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[0] * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getRearLeftRate() {
@@ -47,7 +53,7 @@ public class OctoQuadEncoders {
     }
 
     public double getRearRightRate() {
-        return m_encoderData.velocities[3] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[1] * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public void resetPositions() {

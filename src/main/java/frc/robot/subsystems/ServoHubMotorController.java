@@ -20,7 +20,7 @@ public class ServoHubMotorController {
     private final ServoChannel rearRight;
 
     public ServoHubMotorController() {
-        hub = new ServoHub(1);
+        hub = new ServoHub(3);
 
         ServoHubConfig config = new ServoHubConfig();
         PulseRange range = new PulseRange(500, 1500, 2500);
@@ -31,22 +31,38 @@ public class ServoHubMotorController {
         config.channel4.pulseRange(range);
         config.channel5.pulseRange(range);
 
-        hub.configure(config, ResetMode.kResetSafeParameters);
-        hub.setBankPulsePeriod(Bank.kBank0_2, 5050);
-        hub.setBankPulsePeriod(Bank.kBank3_5, 5050);
+        System.out.println(hub.configure(config, ResetMode.kResetSafeParameters));
+        System.out.println(hub.setBankPulsePeriod(Bank.kBank0_2, 5050));
+        System.out.println(hub.setBankPulsePeriod(Bank.kBank3_5, 5050));
 
         frontLeft = hub.getServoChannel(ChannelId.kChannelId0);
-        frontRight = hub.getServoChannel(ChannelId.kChannelId1);
-        rearLeft = hub.getServoChannel(ChannelId.kChannelId4);
+        frontRight = hub.getServoChannel(ChannelId.kChannelId4);
+        rearLeft = hub.getServoChannel(ChannelId.kChannelId1);
         rearRight = hub.getServoChannel(ChannelId.kChannelId5);
 
-        frontLeft.setEnabled(true);
-        frontRight.setEnabled(true);
-        rearLeft.setEnabled(true);
-        rearRight.setEnabled(true);
+        System.out.println(frontLeft.setEnabled(true));
+        System.out.println(frontRight.setEnabled(true));
+        System.out.println(rearLeft.setEnabled(true));
+        System.out.println(rearRight.setEnabled(true));
     }
 
     public void setFrontLeft(double speed) {
+        double clamped = MathUtil.clamp(speed, -1, 1);
+
+        // -1, 1 to -1000, 1000
+        clamped *= 1000;
+        clamped += 1500;
+
+        // -1000, 1000 to 500, 2500
+
+        if (clamped > 1490 && clamped < 1510) {
+            clamped = 1500;
+        }
+
+        frontLeft.setPulseWidth((int) clamped);
+    }
+
+    public void setFrontRight(double speed) {
         double clamped = MathUtil.clamp(speed, -1, 1);
 
         // Reverse
@@ -58,16 +74,9 @@ public class ServoHubMotorController {
 
         // -1000, 1000 to 500, 2500
 
-        frontLeft.setPulseWidth((int) clamped);
-    }
-
-    public void setFrontRight(double speed) {
-        double clamped = MathUtil.clamp(speed, -1, 1);
-        // -1, 1 to -1000, 1000
-        clamped *= 1000;
-        clamped += 1500;
-
-        // -1000, 1000 to 500, 2500
+        if (clamped > 1490 && clamped < 1510) {
+            clamped = 1500;
+        }
 
         frontRight.setPulseWidth((int) clamped);
     }
@@ -75,6 +84,22 @@ public class ServoHubMotorController {
     public void setRearLeft(double speed) {
         double clamped = MathUtil.clamp(speed, -1, 1);
 
+        // -1, 1 to -1000, 1000
+        clamped *= 1000;
+        clamped += 1500;
+
+        // -1000, 1000 to 500, 2500
+
+        if (clamped > 1490 && clamped < 1510) {
+            clamped = 1500;
+        }
+
+        rearLeft.setPulseWidth((int) clamped);
+    }
+
+    public void setRearRight(double speed) {
+        double clamped = MathUtil.clamp(speed, -1, 1);
+
         // Reverse
         clamped *= -1;
 
@@ -84,16 +109,9 @@ public class ServoHubMotorController {
 
         // -1000, 1000 to 500, 2500
 
-        rearLeft.setPulseWidth((int) clamped);
-    }
-
-    public void setRearRight(double speed) {
-        double clamped = MathUtil.clamp(speed, -1, 1);
-        // -1, 1 to -1000, 1000
-        clamped *= 1000;
-        clamped += 1500;
-
-        // -1000, 1000 to 500, 2500
+        if (clamped > 1490 && clamped < 1510) {
+            clamped = 1500;
+        }
 
         rearRight.setPulseWidth((int) clamped);
     }

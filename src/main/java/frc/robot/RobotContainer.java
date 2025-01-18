@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,6 +33,7 @@ import java.util.List;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
+@Logged
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -53,8 +55,8 @@ public class RobotContainer {
             () ->
                 m_robotDrive.drive(
                     -m_driverController.getLeftY(),
-                    -m_driverController.getRightX(),
                     -m_driverController.getLeftX(),
+                    m_driverController.getRightX(),
                     false),
             m_robotDrive));
   }

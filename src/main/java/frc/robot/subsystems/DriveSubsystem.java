@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
@@ -13,7 +15,9 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@Logged
 public class DriveSubsystem extends SubsystemBase {
+  @NotLogged
   private final ServoHubMotorController m_hubMotors = new ServoHubMotorController();
 
   private final MecanumDrive m_drive = new MecanumDrive(m_hubMotors::setFrontLeft, m_hubMotors::setRearLeft,
@@ -22,6 +26,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final OctoQuadEncoders m_encoders = new OctoQuadEncoders();
 
   // Odometry class for tracking robot pose
+  @NotLogged
   MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(
       DriveConstants.kDriveKinematics,
       getRotation2d(),
