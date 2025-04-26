@@ -20,7 +20,7 @@ public class ServoHubMotorController {
     private final ServoChannel rearRight;
 
     public ServoHubMotorController() {
-        hub = new ServoHub(3);
+        hub = new ServoHub(0, 3);
 
         ServoHubConfig config = new ServoHubConfig();
         PulseRange range = new PulseRange(500, 1500, 2500);
