@@ -61,15 +61,17 @@ public class RobotContainer {
             () ->
                 m_robotDrive.drive(
                     -m_driverController.getLeftY(),
+                    m_driverController.getRawButton(3) ? -0.5 : m_driverController.getRawButton(5) ? 0.5 : 0,
                     m_driverController.getLeftX(),
-                    m_driverController.getRightX(),
                     false),
             m_robotDrive));
 
     m_spinners.setDefaultCommand(
         new RunCommand(() -> {
-            m_spinners.setLeft((m_driverController.getL2Axis() + 1) / 2);
-            m_spinners.setRight((m_driverController.getR2Axis() + 1) / 2);
+            double left = m_driverController.getRightX();
+            double right = m_driverController.getRawButton(10) ? 1 : 0;
+            m_spinners.setLeft(left);
+            m_spinners.setRight(right);
         }, m_spinners)
     );
   }

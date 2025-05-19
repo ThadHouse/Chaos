@@ -9,7 +9,7 @@ import frc.robot.subsystems.OctoQuad.EncoderData;
 @Logged
 public class OctoQuadEncoders {
     @NotLogged
-    private final OctoQuad m_octoQuad = new OctoQuad(Port.kOnboard);
+    private final OctoQuad m_octoQuad = new OctoQuad(Port.kPort0);
 
     @NotLogged
     private final EncoderData m_encoderData = new EncoderData();
