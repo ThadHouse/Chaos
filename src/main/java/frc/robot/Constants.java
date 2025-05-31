@@ -19,6 +19,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  */
 public final class Constants {
   public static final class DriveConstants {
+    public static final double kMaxSpeedMetersPerSecond = 0.4;
+    public static final double kMaxAngularSpeed = 0.2 * Math.PI; // radians per second
+
     public static final int kFrontLeftMotorPort = 0;
     public static final int kRearLeftMotorPort = 1;
     public static final int kFrontRightMotorPort = 2;
@@ -68,6 +71,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final double kDriveDeadband = 0.05;
   }
 
   public static final class AutoConstants {

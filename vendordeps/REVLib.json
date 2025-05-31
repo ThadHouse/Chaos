@@ -1,8 +1,8 @@
 {
     "fileName": "REVLib.json",
     "name": "REVLib",
-    "version": "2025.0.3-sc-43",
-    "frcYear": "2025",
+    "version": "2025.0.3-sc-42",
+    "frcYear": "2027_alpha1",
     "uuid": "3f48eb8c-50fe-43a6-9cb7-44c86353c4cb",
     "mavenUrls": [
         "https://maven.revrobotics.com/"
@@ -12,14 +12,14 @@
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-java",
-            "version": "2025.0.3-sc-43"
+            "version": "2025.0.3-sc-42"
         }
     ],
     "jniDependencies": [
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-driver",
-            "version": "2025.0.3-sc-43",
+            "version": "2025.0.3-sc-42",
             "skipInvalidPlatforms": true,
             "isJar": false,
             "validPlatforms": [
@@ -36,7 +36,7 @@
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-cpp",
-            "version": "2025.0.3-sc-43",
+            "version": "2025.0.3-sc-42",
             "libName": "REVLib",
             "headerClassifier": "headers",
             "sharedLibrary": false,
@@ -53,7 +53,7 @@
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-driver",
-            "version": "2025.0.3-sc-43",
+            "version": "2025.0.3-sc-42",
             "libName": "REVLibDriver",
             "headerClassifier": "headers",
             "sharedLibrary": false,

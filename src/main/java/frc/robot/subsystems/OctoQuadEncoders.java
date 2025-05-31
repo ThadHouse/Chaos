@@ -2,19 +2,20 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.OctoQuad.EncoderData;
 
 @Logged
 public class OctoQuadEncoders {
     @NotLogged
-    private final OctoQuad m_octoQuad = new OctoQuad(Port.kPort0);
+    private final OctoQuad m_octoQuad;
 
     @NotLogged
     private final EncoderData m_encoderData = new EncoderData();
 
-    public OctoQuadEncoders() {
+    public OctoQuadEncoders(I2C.Port port) {
+        m_octoQuad = new OctoQuad(port);
         m_octoQuad.resetAllPositions();
         m_octoQuad.setDirection(0, true);
         m_octoQuad.setDirection(1, true);

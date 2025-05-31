@@ -4,18 +4,17 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -23,9 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class DriveSubsystem extends SubsystemBase {
   @NotLogged
   private final ServoHubMotorController m_hubMotors = new ServoHubMotorController();
-
-  private final MecanumDrive m_drive = new MecanumDrive(m_hubMotors::setFrontLeft, m_hubMotors::setRearLeft,
-      m_hubMotors::setFrontRight, m_hubMotors::setRearRight);
 
   private final OctoQuadEncoders m_encoders = new OctoQuadEncoders(Port.kPort0);
 
@@ -35,10 +31,18 @@ public class DriveSubsystem extends SubsystemBase {
   @NotLogged
   private MecanumDriveOdometry m_odometry;
 
+  private final PIDController m_frontLeftPIDController = new PIDController(1, 0, 0);
+  private final PIDController m_frontRightPIDController = new PIDController(1, 0, 0);
+  private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
+  private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     m_pinpoint.resetPosAndIMU();
-    m_encoders.resetPositions();
+
+    Timer.delay(0.5);
+
+    m_pinpoint.update();
 
     m_odometry = new MecanumDriveOdometry(
         DriveConstants.kDriveKinematics,
@@ -48,8 +52,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_pinpoint.update();
     m_encoders.periodic();
+    m_pinpoint.update();
     // Update the odometry in the periodic block
     m_odometry.update(getRotation2d(), getCurrentWheelDistances());
   }
@@ -67,13 +71,46 @@ public class DriveSubsystem extends SubsystemBase {
     return m_pinpoint.getPosition();
   }
 
-  public void zeroPose() {
+  public Rotation2d getRotation2d() {
+    return m_pinpoint.getHeading();
+  }
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetToZero() {
     m_pinpoint.setPosition(Pose2d.kZero);
-    m_encoders.resetPositions();
+    m_pinpoint.update();
     m_odometry = new MecanumDriveOdometry(
         DriveConstants.kDriveKinematics,
         getRotation2d(),
         new MecanumDriveWheelPositions());
+  }
+
+  public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
+    final double frontLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontLeft);
+    final double frontRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontRight);
+    final double backLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearLeft);
+    final double backRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearRight);
+
+    MecanumDriveWheelSpeeds currentSpeeds = getCurrentWheelSpeeds();
+
+    final double frontLeftOutput = m_frontLeftPIDController.calculate(
+         currentSpeeds.frontLeft, speeds.frontLeft);
+    final double frontRightOutput = m_frontRightPIDController.calculate(
+        currentSpeeds.frontRight, speeds.frontRight);
+    final double backLeftOutput = m_backLeftPIDController.calculate(
+        currentSpeeds.rearLeft, speeds.rearLeft);
+    final double backRightOutput = m_backRightPIDController.calculate(
+        currentSpeeds.rearRight, speeds.rearRight);
+
+    // TODO get battery voltage
+    m_hubMotors.setFrontLeft((frontLeftOutput + frontLeftFeedforward) / 12.0);
+    m_hubMotors.setFrontRight((frontRightOutput + frontRightFeedforward) / 12.0);
+    m_hubMotors.setRearLeft((backLeftOutput + backLeftFeedforward) / 12.0);
+    m_hubMotors.setRearRight((backRightOutput + backRightFeedforward) / 12.0);
   }
 
   /**
@@ -88,24 +125,18 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    if (fieldRelative) {
-      m_drive.driveCartesian(xSpeed, ySpeed, rot, getRotation2d());
-    } else {
-      m_drive.driveCartesian(xSpeed, ySpeed, rot);
-    }
-  }
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
+    // Convert the commanded speeds into the correct units for the drivetrain
+    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
-  /** Sets the front left drive MotorController to a voltage. */
-  public void setDriveMotorControllersVolts(
-      double frontLeftVoltage,
-      double frontRightVoltage,
-      double rearLeftVoltage,
-      double rearRightVoltage) {
-    m_hubMotors.setFrontLeft(frontLeftVoltage / RobotController.getBatteryVoltage());
-    m_hubMotors.setRearLeft(rearLeftVoltage / RobotController.getBatteryVoltage());
-    m_hubMotors.setFrontRight(frontRightVoltage / RobotController.getBatteryVoltage());
-    m_hubMotors.setRearRight(rearRightVoltage / RobotController.getBatteryVoltage());
+    var chassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
+    if (fieldRelative) {
+      chassisSpeeds = chassisSpeeds.toRobotRelative(getRotation2d());
+    }
+    setSpeeds(DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds.discretize(period))
+        .desaturate(DriveConstants.kMaxSpeedMetersPerSecond));
   }
 
   /**
@@ -133,38 +164,5 @@ public class DriveSubsystem extends SubsystemBase {
         m_encoders.getFrontRightPosition(),
         m_encoders.getRearLeftPosition(),
         m_encoders.getRearRightPosition());
-  }
-
-  /**
-   * Sets the max output of the drive. Useful for scaling the drive to drive more
-   * slowly.
-   *
-   * @param maxOutput the maximum output to which the drive will be constrained
-   */
-  public void setMaxOutput(double maxOutput) {
-    m_drive.setMaxOutput(maxOutput);
-  }
-
-  public Rotation2d getRotation2d() {
-    return m_pinpoint.getHeading();
-  }
-
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
-  public double getHeading() {
-    return getRotation2d().getDegrees();
-    // return m_gyro.getRotation2d().getDegrees();
-  }
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  public double getTurnRate() {
-    return m_pinpoint.getHeadingVelocity().in(DegreesPerSecond);
   }
 }
