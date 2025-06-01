@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import frc.robot.Constants.DriveConstants;
@@ -39,6 +40,10 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     m_pinpoint.resetPosAndIMU();
     m_encoders.resetPositions();
+
+    Timer.delay(0.5);
+
+    m_pinpoint.update();
 
     m_odometry = new MecanumDriveOdometry(
         DriveConstants.kDriveKinematics,
@@ -102,10 +107,11 @@ public class DriveSubsystem extends SubsystemBase {
       double frontRightVoltage,
       double rearLeftVoltage,
       double rearRightVoltage) {
-    m_hubMotors.setFrontLeft(frontLeftVoltage / RobotController.getBatteryVoltage());
-    m_hubMotors.setRearLeft(rearLeftVoltage / RobotController.getBatteryVoltage());
-    m_hubMotors.setFrontRight(frontRightVoltage / RobotController.getBatteryVoltage());
-    m_hubMotors.setRearRight(rearRightVoltage / RobotController.getBatteryVoltage());
+    var battery = RobotController.getBatteryVoltage();
+    m_hubMotors.setFrontLeft(frontLeftVoltage / battery);
+    m_hubMotors.setRearLeft(rearLeftVoltage / battery);
+    m_hubMotors.setFrontRight(frontRightVoltage / battery);
+    m_hubMotors.setRearRight(rearRightVoltage / battery);
   }
 
   /**

@@ -7,15 +7,21 @@ package frc.robot;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.math.system.plant.DCMotor;
+// import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
+// import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.DriveSubsystemNew;
 import frc.robot.subsystems.Spinners;
+// import frc.utils.CommandGamepad;
 import frc.utils.Gamepad;
 import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+// import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -26,13 +32,16 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 @Logged
 public class RobotContainer {
     // The robot's subsystems
-    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+    private final DriveSubsystemNew m_robotDrive = new DriveSubsystemNew();
 
     private final Spinners m_spinners = new Spinners();
 
     @NotLogged
     // The driver's controller
     private final Gamepad m_driverController = new Gamepad(OIConstants.kDriverControllerPort);
+
+    // @NotLogged
+    // private final CommandGamepad m_driveGp = new CommandGamepad(OIConstants.kDriverControllerPort);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -49,8 +58,8 @@ public class RobotContainer {
                 new RunCommand(
                         () -> m_robotDrive.drive(
                                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                                MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                                MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                                 true),
                         m_robotDrive));
 
@@ -73,6 +82,22 @@ public class RobotContainer {
      * {@link JoystickButton}.
      */
     private void configureButtonBindings() {
+        // m_driveGp
+        //         .a()
+        //         .and(m_driveGp.leftBumper())
+        //         .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        // m_driveGp
+        //         .b()
+        //         .and(m_driveGp.leftBumper())
+        //         .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        // m_driveGp
+        //         .x()
+        //         .and(m_driveGp.leftBumper())
+        //         .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        // m_driveGp
+        //         .y()
+        //         .and(m_driveGp.leftBumper())
+        //         .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     }
 

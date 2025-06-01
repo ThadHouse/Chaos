@@ -42,19 +42,19 @@ public class OctoQuadEncoders {
     }
 
     public double getFrontLeftRate() {
-        return m_encoderData.velocities[3] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[3] * DriveConstants.kEncoderSampleRate * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getFrontRightRate() {
-        return m_encoderData.velocities[0] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[0] * DriveConstants.kEncoderSampleRate * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getRearLeftRate() {
-        return m_encoderData.velocities[2] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[2] * DriveConstants.kEncoderSampleRate * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public double getRearRightRate() {
-        return m_encoderData.velocities[1] * DriveConstants.kEncoderDistancePerPulse;
+        return m_encoderData.velocities[1] * DriveConstants.kEncoderSampleRate * DriveConstants.kEncoderDistancePerPulse;
     }
 
     public void resetPositions() {

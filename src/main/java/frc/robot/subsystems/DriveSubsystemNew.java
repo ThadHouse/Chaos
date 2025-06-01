@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+// import static edu.wpi.first.units.Units.Meter;
+// import static edu.wpi.first.units.Units.MetersPerSecond;
+// import static edu.wpi.first.units.Units.Volt;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.PIDController;
@@ -13,13 +17,19 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+// import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import frc.robot.Constants.DriveConstants;
+// import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 @Logged
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystemNew extends SubsystemBase {
   @NotLogged
   private final ServoHubMotorController m_hubMotors = new ServoHubMotorController();
 
@@ -31,14 +41,15 @@ public class DriveSubsystem extends SubsystemBase {
   @NotLogged
   private MecanumDriveOdometry m_odometry;
 
-  private final PIDController m_frontLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_frontRightPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
+  private final PIDController m_frontLeftPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
+  private final PIDController m_frontRightPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
+  private final PIDController m_backLeftPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
+  private final PIDController m_backRightPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystemNew() {
     m_pinpoint.resetPosAndIMU();
+    m_encoders.resetPositions();
 
     Timer.delay(0.5);
 
@@ -48,7 +59,54 @@ public class DriveSubsystem extends SubsystemBase {
         DriveConstants.kDriveKinematics,
         getRotation2d(),
         new MecanumDriveWheelPositions());
+
+    // routine = new SysIdRoutine(
+    //     new SysIdRoutine.Config(),
+    //     new SysIdRoutine.Mechanism(this::voltageDrive, this::logMotors, this));
   }
+
+  // private final SysIdRoutine routine;
+
+  // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+  //   return routine.quasistatic(direction);
+  // }
+
+  // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+  //   return routine.dynamic(direction);
+  // }
+
+  // private void voltageDrive(Voltage voltage) {
+  //   var battery = RobotController.getBatteryVoltage();
+  //   m_hubMotors.setFrontLeft((voltage.in(Volt)) / battery);
+  //   m_hubMotors.setFrontRight((voltage.in(Volt)) / battery);
+  //   m_hubMotors.setRearLeft((voltage.in(Volt)) / battery);
+  //   m_hubMotors.setRearRight((voltage.in(Volt)) / battery);
+  //   lastVoltage = voltage; 
+  // }
+
+  // private Voltage lastVoltage = Volt.of(0);
+
+  // private void logMotors(SysIdRoutineLog log) {
+  //   log.motor("drive-front-left")
+  //       .voltage(lastVoltage)
+  //       .linearPosition(Meter.of(m_encoders.getFrontLeftPosition()))
+  //       .linearVelocity(MetersPerSecond.of(m_encoders.getFrontLeftRate()));
+
+  //   log.motor("drive-front-right")
+  //       .voltage(lastVoltage)
+  //       .linearPosition(Meter.of(m_encoders.getFrontRightPosition()))
+  //       .linearVelocity(MetersPerSecond.of(m_encoders.getFrontRightRate()));
+
+  //   log.motor("drive-rear-left")
+  //       .voltage(lastVoltage)
+  //       .linearPosition(Meter.of(m_encoders.getRearLeftPosition()))
+  //       .linearVelocity(MetersPerSecond.of(m_encoders.getRearLeftRate()));
+
+  //   log.motor("drive-rear-right")
+  //       .voltage(lastVoltage)
+  //       .linearPosition(Meter.of(m_encoders.getRearRightPosition()))
+  //       .linearVelocity(MetersPerSecond.of(m_encoders.getRearRightRate()));
+  // }
 
   @Override
   public void periodic() {
@@ -90,15 +148,21 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final double frontLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontLeft);
-    final double frontRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontRight);
-    final double backLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearLeft);
-    final double backRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearRight);
+
+    SmartDashboard.putNumber("frontLeft", speeds.frontLeft);
+    SmartDashboard.putNumber("frontRight", speeds.rearRight);
+    SmartDashboard.putNumber("readLeft", speeds.rearLeft);
+    SmartDashboard.putNumber("rearRight", speeds.rearRight);
+
+    final double frontLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontLeft, speeds.frontLeft);
+    final double frontRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontRight, speeds.frontRight);
+    final double backLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearLeft, speeds.rearLeft);
+    final double backRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearRight, speeds.rearRight);
 
     MecanumDriveWheelSpeeds currentSpeeds = getCurrentWheelSpeeds();
 
     final double frontLeftOutput = m_frontLeftPIDController.calculate(
-         currentSpeeds.frontLeft, speeds.frontLeft);
+        currentSpeeds.frontLeft, speeds.frontLeft);
     final double frontRightOutput = m_frontRightPIDController.calculate(
         currentSpeeds.frontRight, speeds.frontRight);
     final double backLeftOutput = m_backLeftPIDController.calculate(
@@ -106,11 +170,21 @@ public class DriveSubsystem extends SubsystemBase {
     final double backRightOutput = m_backRightPIDController.calculate(
         currentSpeeds.rearRight, speeds.rearRight);
 
-    // TODO get battery voltage
-    m_hubMotors.setFrontLeft((frontLeftOutput + frontLeftFeedforward) / 12.0);
-    m_hubMotors.setFrontRight((frontRightOutput + frontRightFeedforward) / 12.0);
-    m_hubMotors.setRearLeft((backLeftOutput + backLeftFeedforward) / 12.0);
-    m_hubMotors.setRearRight((backRightOutput + backRightFeedforward) / 12.0);
+    SmartDashboard.putNumber("frontLeftOutput", frontLeftOutput);
+    SmartDashboard.putNumber("frontRightOutput", frontRightOutput);
+    SmartDashboard.putNumber("readLeftOutput", backLeftOutput);
+    SmartDashboard.putNumber("rearRightOutput", backRightOutput);
+
+    SmartDashboard.putNumber("frontLeftFF", frontLeftFeedforward);
+    SmartDashboard.putNumber("frontRightFF", frontRightFeedforward);
+    SmartDashboard.putNumber("readLeftFF", backLeftFeedforward);
+    SmartDashboard.putNumber("rearRightFF", backRightFeedforward);
+
+    var battery = RobotController.getBatteryVoltage();
+    m_hubMotors.setFrontLeft((frontLeftOutput + frontLeftFeedforward) / battery);
+    m_hubMotors.setFrontRight((frontRightOutput + frontRightFeedforward) / battery);
+    m_hubMotors.setRearLeft((backLeftOutput + backLeftFeedforward) / battery);
+    m_hubMotors.setRearRight((backRightOutput + backRightFeedforward) / battery);
   }
 
   /**
@@ -125,17 +199,21 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, double period) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    SmartDashboard.putNumber("xSpeed", xSpeedDelivered);
+    SmartDashboard.putNumber("ySpeed", ySpeedDelivered);
+    SmartDashboard.putNumber("rot", rotDelivered);
+
     var chassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
     if (fieldRelative) {
       chassisSpeeds = chassisSpeeds.toRobotRelative(getRotation2d());
     }
-    setSpeeds(DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds.discretize(period))
+    setSpeeds(DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds.discretize(0.02))
         .desaturate(DriveConstants.kMaxSpeedMetersPerSecond));
   }
 
