@@ -4,29 +4,24 @@
 
 package frc.robot.subsystems;
 
-// import static edu.wpi.first.units.Units.Meter;
-// import static edu.wpi.first.units.Units.MetersPerSecond;
-// import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-// import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj.OnboardIMU.MountOrientation;
 import frc.robot.Constants.DriveConstants;
-// import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.GoBildaPinpoint.GoBildaOdometryPods;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 @Logged
 public class DriveSubsystemNew extends SubsystemBase {
@@ -36,6 +31,8 @@ public class DriveSubsystemNew extends SubsystemBase {
   private final OctoQuadEncoders m_encoders = new OctoQuadEncoders(Port.kPort0);
 
   private final GoBildaPinpoint m_pinpoint = new GoBildaPinpoint(Port.kPort1);
+  
+  private final OnboardIMU m_onboardImu = new OnboardIMU(MountOrientation.kLandscape);
 
   // Odometry class for tracking robot pose
   @NotLogged
@@ -49,6 +46,10 @@ public class DriveSubsystemNew extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystemNew() {
     m_pinpoint.resetPosAndIMU();
+
+    m_pinpoint.setEncoderResolution(GoBildaOdometryPods.goBILDA_4_BAR_POD);
+    // TODO set x and y on pinpoint
+
     m_encoders.resetPositions();
 
     Timer.delay(0.5);
@@ -57,63 +58,16 @@ public class DriveSubsystemNew extends SubsystemBase {
 
     m_odometry = new MecanumDriveOdometry(
         DriveConstants.kDriveKinematics,
-        getRotation2d(),
+        m_onboardImu.getRotation2d(),
         new MecanumDriveWheelPositions());
-
-    // routine = new SysIdRoutine(
-    //     new SysIdRoutine.Config(),
-    //     new SysIdRoutine.Mechanism(this::voltageDrive, this::logMotors, this));
   }
-
-  // private final SysIdRoutine routine;
-
-  // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-  //   return routine.quasistatic(direction);
-  // }
-
-  // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-  //   return routine.dynamic(direction);
-  // }
-
-  // private void voltageDrive(Voltage voltage) {
-  //   var battery = RobotController.getBatteryVoltage();
-  //   m_hubMotors.setFrontLeft((voltage.in(Volt)) / battery);
-  //   m_hubMotors.setFrontRight((voltage.in(Volt)) / battery);
-  //   m_hubMotors.setRearLeft((voltage.in(Volt)) / battery);
-  //   m_hubMotors.setRearRight((voltage.in(Volt)) / battery);
-  //   lastVoltage = voltage; 
-  // }
-
-  // private Voltage lastVoltage = Volt.of(0);
-
-  // private void logMotors(SysIdRoutineLog log) {
-  //   log.motor("drive-front-left")
-  //       .voltage(lastVoltage)
-  //       .linearPosition(Meter.of(m_encoders.getFrontLeftPosition()))
-  //       .linearVelocity(MetersPerSecond.of(m_encoders.getFrontLeftRate()));
-
-  //   log.motor("drive-front-right")
-  //       .voltage(lastVoltage)
-  //       .linearPosition(Meter.of(m_encoders.getFrontRightPosition()))
-  //       .linearVelocity(MetersPerSecond.of(m_encoders.getFrontRightRate()));
-
-  //   log.motor("drive-rear-left")
-  //       .voltage(lastVoltage)
-  //       .linearPosition(Meter.of(m_encoders.getRearLeftPosition()))
-  //       .linearVelocity(MetersPerSecond.of(m_encoders.getRearLeftRate()));
-
-  //   log.motor("drive-rear-right")
-  //       .voltage(lastVoltage)
-  //       .linearPosition(Meter.of(m_encoders.getRearRightPosition()))
-  //       .linearVelocity(MetersPerSecond.of(m_encoders.getRearRightRate()));
-  // }
 
   @Override
   public void periodic() {
     m_encoders.periodic();
     m_pinpoint.update();
     // Update the odometry in the periodic block
-    m_odometry.update(getRotation2d(), getCurrentWheelDistances());
+    m_odometry.update(m_onboardImu.getRotation2d(), getCurrentWheelDistances());
   }
 
   /**
@@ -129,30 +83,16 @@ public class DriveSubsystemNew extends SubsystemBase {
     return m_pinpoint.getPosition();
   }
 
-  public Rotation2d getRotation2d() {
-    return m_pinpoint.getHeading();
-  }
-
-  /**
-   * Resets the odometry to the specified pose.
-   *
-   * @param pose The pose to which to set the odometry.
-   */
-  public void resetToZero() {
-    m_pinpoint.setPosition(Pose2d.kZero);
-    m_pinpoint.update();
-    m_odometry = new MecanumDriveOdometry(
-        DriveConstants.kDriveKinematics,
-        getRotation2d(),
-        new MecanumDriveWheelPositions());
+  // Reset the odometry to the specified pose
+  public void resetOdometry(Pose2d pose) {
+    m_pinpoint.setPosition(pose);
+    m_odometry.resetPosition(
+        m_onboardImu.getRotation2d(),
+        getCurrentWheelDistances(),
+        pose);
   }
 
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-
-    SmartDashboard.putNumber("frontLeft", speeds.frontLeft);
-    SmartDashboard.putNumber("frontRight", speeds.rearRight);
-    SmartDashboard.putNumber("readLeft", speeds.rearLeft);
-    SmartDashboard.putNumber("rearRight", speeds.rearRight);
 
     final double frontLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontLeft, speeds.frontLeft);
     final double frontRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontRight, speeds.frontRight);
@@ -169,16 +109,6 @@ public class DriveSubsystemNew extends SubsystemBase {
         currentSpeeds.rearLeft, speeds.rearLeft);
     final double backRightOutput = m_backRightPIDController.calculate(
         currentSpeeds.rearRight, speeds.rearRight);
-
-    SmartDashboard.putNumber("frontLeftOutput", frontLeftOutput);
-    SmartDashboard.putNumber("frontRightOutput", frontRightOutput);
-    SmartDashboard.putNumber("readLeftOutput", backLeftOutput);
-    SmartDashboard.putNumber("rearRightOutput", backRightOutput);
-
-    SmartDashboard.putNumber("frontLeftFF", frontLeftFeedforward);
-    SmartDashboard.putNumber("frontRightFF", frontRightFeedforward);
-    SmartDashboard.putNumber("readLeftFF", backLeftFeedforward);
-    SmartDashboard.putNumber("rearRightFF", backRightFeedforward);
 
     var battery = RobotController.getBatteryVoltage();
     m_hubMotors.setFrontLeft((frontLeftOutput + frontLeftFeedforward) / battery);
@@ -205,16 +135,14 @@ public class DriveSubsystemNew extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
-    SmartDashboard.putNumber("xSpeed", xSpeedDelivered);
-    SmartDashboard.putNumber("ySpeed", ySpeedDelivered);
-    SmartDashboard.putNumber("rot", rotDelivered);
-
     var chassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
     if (fieldRelative) {
-      chassisSpeeds = chassisSpeeds.toRobotRelative(getRotation2d());
+      chassisSpeeds = chassisSpeeds.toRobotRelative(m_odometry.getPose().getRotation());
     }
-    setSpeeds(DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds.discretize(0.02))
-        .desaturate(DriveConstants.kMaxSpeedMetersPerSecond));
+    chassisSpeeds = chassisSpeeds.discretize(0.02);
+    var mecanumStates = DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds);
+    mecanumStates = mecanumStates.desaturate(DriveConstants.kMaxWheelSpeedMetersPerSecond);
+    setSpeeds(mecanumStates);
   }
 
   /**
@@ -242,5 +170,25 @@ public class DriveSubsystemNew extends SubsystemBase {
         m_encoders.getFrontRightPosition(),
         m_encoders.getRearLeftPosition(),
         m_encoders.getRearRightPosition());
+  }
+
+  public double getHeading() {
+    return m_odometry.getPose().getRotation().getRadians();
+  }
+
+  public double getRawHeading() {
+    return m_onboardImu.getYawRadians();
+  }
+
+  public double getTurnRate() {
+    return m_onboardImu.getGyroRateX();
+  }
+
+  public double getPinpointTurnRate() {
+    return m_pinpoint.getHeadingVelocity().in(RadiansPerSecond);
+  }
+
+  public double getPinpointHeading() {
+    return m_pinpoint.getHeading().getRadians();
   }
 }
