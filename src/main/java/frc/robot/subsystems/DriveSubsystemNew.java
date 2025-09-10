@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volt;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -14,6 +15,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -21,17 +24,18 @@ import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.OnboardIMU.MountOrientation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.GoBildaPinpoint.GoBildaOdometryPods;
+import frc.utils.ExpansionHubMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @Logged
 public class DriveSubsystemNew extends SubsystemBase {
-  @NotLogged
-  private final ServoHubMotorController m_hubMotors = new ServoHubMotorController();
-
-  private final OctoQuadEncoders m_encoders = new OctoQuadEncoders(Port.kPort0);
+  private final ExpansionHubMotor m_frontLeftMotor = new ExpansionHubMotor(0, DriveConstants.kFrontLeftMotorPort);
+  private final ExpansionHubMotor m_frontRightMotor = new ExpansionHubMotor(0, DriveConstants.kFrontRightMotorPort);
+  private final ExpansionHubMotor m_rearLeftMotor = new ExpansionHubMotor(0, DriveConstants.kRearLeftMotorPort);
+  private final ExpansionHubMotor m_rearRightMotor = new ExpansionHubMotor(0, DriveConstants.kRearRightMotorPort);
 
   private final GoBildaPinpoint m_pinpoint = new GoBildaPinpoint(Port.kPort1);
-  
+
   private final OnboardIMU m_onboardImu = new OnboardIMU(MountOrientation.kLandscape);
 
   // Odometry class for tracking robot pose
@@ -50,7 +54,25 @@ public class DriveSubsystemNew extends SubsystemBase {
     m_pinpoint.setEncoderResolution(GoBildaOdometryPods.goBILDA_4_BAR_POD);
     // TODO set x and y on pinpoint
 
-    m_encoders.resetPositions();
+    m_frontLeftMotor.resetEncoder();
+    m_frontRightMotor.resetEncoder();
+    m_rearLeftMotor.resetEncoder();
+    m_rearRightMotor.resetEncoder();
+
+    m_frontLeftMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
+    m_frontRightMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
+    m_rearLeftMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
+    m_rearRightMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
+
+    m_frontLeftMotor.setReversed(true);
+    m_rearLeftMotor.setReversed(true);
+
+    m_frontLeftMotor.setEnabled(true);
+    m_frontRightMotor.setEnabled(true);
+    m_rearLeftMotor.setEnabled(true);
+    m_rearRightMotor.setEnabled(true);
+
+    // TODO Reversing
 
     Timer.delay(0.5);
 
@@ -64,7 +86,6 @@ public class DriveSubsystemNew extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_encoders.periodic();
     m_pinpoint.update();
     // Update the odometry in the periodic block
     m_odometry.update(m_onboardImu.getRotation2d(), getCurrentWheelDistances());
@@ -110,11 +131,10 @@ public class DriveSubsystemNew extends SubsystemBase {
     final double backRightOutput = m_backRightPIDController.calculate(
         currentSpeeds.rearRight, speeds.rearRight);
 
-    var battery = RobotController.getBatteryVoltage();
-    m_hubMotors.setFrontLeft((frontLeftOutput + frontLeftFeedforward) / battery);
-    m_hubMotors.setFrontRight((frontRightOutput + frontRightFeedforward) / battery);
-    m_hubMotors.setRearLeft((backLeftOutput + backLeftFeedforward) / battery);
-    m_hubMotors.setRearRight((backRightOutput + backRightFeedforward) / battery);
+    m_frontLeftMotor.setVoltage(Volt.of(frontLeftOutput + frontLeftFeedforward));
+    m_frontRightMotor.setVoltage(Volt.of(frontRightOutput + frontRightFeedforward));
+    m_rearLeftMotor.setVoltage(Volt.of(backLeftOutput + backLeftFeedforward));
+    m_rearRightMotor.setVoltage(Volt.of(backRightOutput + backRightFeedforward));
   }
 
   /**
@@ -152,10 +172,10 @@ public class DriveSubsystemNew extends SubsystemBase {
    */
   public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return new MecanumDriveWheelSpeeds(
-        m_encoders.getFrontLeftRate(),
-        m_encoders.getFrontRightRate(),
-        m_encoders.getRearLeftRate(),
-        m_encoders.getRearRightRate());
+        m_frontLeftMotor.getEncoderVelocity(),
+        m_frontRightMotor.getEncoderVelocity(),
+        m_rearLeftMotor.getEncoderVelocity(),
+        m_rearRightMotor.getEncoderVelocity());
   }
 
   /**
@@ -166,10 +186,10 @@ public class DriveSubsystemNew extends SubsystemBase {
    */
   public MecanumDriveWheelPositions getCurrentWheelDistances() {
     return new MecanumDriveWheelPositions(
-        m_encoders.getFrontLeftPosition(),
-        m_encoders.getFrontRightPosition(),
-        m_encoders.getRearLeftPosition(),
-        m_encoders.getRearRightPosition());
+        m_frontLeftMotor.getEncoder(),
+        m_frontRightMotor.getEncoder(),
+        m_rearLeftMotor.getEncoder(),
+        m_rearRightMotor.getEncoder());
   }
 
   public double getHeading() {

@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class CommandGamepad extends CommandGenericHID {
 
-     private final Gamepad m_hid;
+
 
   /**
    * Construct an instance of a controller.
@@ -16,9 +16,9 @@ public class CommandGamepad extends CommandGenericHID {
    */
   public CommandGamepad(int port) {
     super(port);
-    m_hid = new Gamepad(port);
+    //m_hid = new Gamepad(port);
   }
-    
+
 
     /**
    * Constructs a Trigger instance around the A button's digital signal.
