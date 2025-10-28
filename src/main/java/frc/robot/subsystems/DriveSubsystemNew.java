@@ -186,10 +186,10 @@ public class DriveSubsystemNew extends SubsystemBase {
    */
   public MecanumDriveWheelPositions getCurrentWheelDistances() {
     return new MecanumDriveWheelPositions(
-        m_frontLeftMotor.getEncoder(),
-        m_frontRightMotor.getEncoder(),
-        m_rearLeftMotor.getEncoder(),
-        m_rearRightMotor.getEncoder());
+        m_frontLeftMotor.getEncoderPosition(),
+        m_frontRightMotor.getEncoderPosition(),
+        m_rearLeftMotor.getEncoderPosition(),
+        m_rearRightMotor.getEncoderPosition());
   }
 
   public double getHeading() {

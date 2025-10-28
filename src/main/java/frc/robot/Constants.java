@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.I2C;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -72,6 +73,23 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
+  }
+
+  public static final class ShooterConstants {
+    public static final int kShooterMotorPort = 0;
+    public static final int kEncoderPort = 0;
+    public static final I2C.Port kI2cPort = I2C.Port.kPort0;
+    public static final double kP = 0.15305;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kS = -0.55216;
+    public static final double kA = 0.21615;
+    public static final double kV = 0.13021;
+
+    public static final int kEncoderCPR = 28;
+    public static final double kEncoderDistancePerPulse = 1.0 / kEncoderCPR; // Distance units in rotations
+
+    public static final double kEncoderSampleRate = 1000.0 / 50;
   }
 
   public static final class AutoConstants {

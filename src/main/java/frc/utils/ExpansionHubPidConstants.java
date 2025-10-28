@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.utils;
 
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -6,92 +10,158 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.SystemServer;
 
-public class ExpansionHubPidConstants {
-  private final DoublePublisher pPublisher;
-  private final DoublePublisher iPublisher;
-  private final DoublePublisher dPublisher;
-  private final DoublePublisher sPublisher;
-  private final DoublePublisher vPublisher;
-  private final DoublePublisher aPublisher;
+/** This class contains PID constants for an ExpansionHub motor. */
+class ExpansionHubPidConstants {
+  private final DoublePublisher m_pPublisher;
+  private final DoublePublisher m_iPublisher;
+  private final DoublePublisher m_dPublisher;
+  private final DoublePublisher m_sPublisher;
+  private final DoublePublisher m_vPublisher;
+  private final DoublePublisher m_aPublisher;
 
-  private final BooleanPublisher continuousPublisher;
-  private final DoublePublisher continuousMinimumPublisher;
-  private final DoublePublisher continuousMaximumPublisher;
+  private final BooleanPublisher m_continuousPublisher;
+  private final DoublePublisher m_continuousMinimumPublisher;
+  private final DoublePublisher m_continuousMaximumPublisher;
 
-  public ExpansionHubPidConstants(int hubNumber, int motorNumber, boolean isVelocityPid) {
-    if (hubNumber < 0 || hubNumber > 3) {
-      throw new IllegalArgumentException(
-          "Hub number out of range, must be between 0 and 3 inclusive (Matching USB numbers)");
-    }
-
-    if (motorNumber < 0 || motorNumber > 3) {
-      throw new IllegalArgumentException(
-          "Motor number out of range, must be between 0 and 3 inclusive");
-    }
-
+  ExpansionHubPidConstants(int hubNumber, int motorNumber, boolean isVelocityPid) {
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 
-    PubSubOption[] options = new PubSubOption[] { PubSubOption.sendAll(true), PubSubOption.keepDuplicates(true),
-        PubSubOption.periodic(0.005) };
+    PubSubOption[] options =
+        new PubSubOption[] {
+          PubSubOption.sendAll(true),
+          PubSubOption.keepDuplicates(true),
+          PubSubOption.periodic(0.005)
+        };
 
     String pidType = isVelocityPid ? "velocity" : "position";
 
-    pPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/kp")
-        .publish(options);
+    m_pPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/kp")
+            .publish(options);
 
-    iPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/ki")
-        .publish(options);
+    m_iPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/ki")
+            .publish(options);
 
-    dPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/kd")
-        .publish(options);
+    m_dPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/kd")
+            .publish(options);
 
-    aPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/ka")
-        .publish(options);
+    m_aPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/ka")
+            .publish(options);
 
-    vPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/kv")
-        .publish(options);
+    m_vPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/kv")
+            .publish(options);
 
-    sPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/ks")
-        .publish(options);
+    m_sPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/ks")
+            .publish(options);
 
-    continuousPublisher = systemServer
-        .getBooleanTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/continuous")
-        .publish(options);
+    m_continuousPublisher =
+        systemServer
+            .getBooleanTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/continuous")
+            .publish(options);
 
-    continuousMinimumPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/continuousMinimum")
-        .publish(options);
+    m_continuousMinimumPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/"
+                    + hubNumber
+                    + "/motor"
+                    + motorNumber
+                    + "/pid/"
+                    + pidType
+                    + "/continuousMinimum")
+            .publish(options);
 
-    continuousMaximumPublisher = systemServer
-        .getDoubleTopic("/rhsp/" + hubNumber + "/motor" + motorNumber + "/pid/" + pidType + "/continousMaximum")
-        .publish(options);
+    m_continuousMaximumPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/"
+                    + hubNumber
+                    + "/motor"
+                    + motorNumber
+                    + "/pid/"
+                    + pidType
+                    + "/continousMaximum")
+            .publish(options);
   }
 
+  /**
+   * Sets the PID Controller gain parameters.
+   *
+   * <p>Set the proportional, integral, and differential coefficients.
+   *
+   * @param p The proportional coefficient.
+   * @param i The integral coefficient.
+   * @param d The derivative coefficient.
+   */
   public void setPID(double p, double i, double d) {
-    pPublisher.set(p);
-    iPublisher.set(i);
-    dPublisher.set(d);
+    m_pPublisher.set(p);
+    m_iPublisher.set(i);
+    m_dPublisher.set(d);
   }
 
+  /**
+   * Sets the feed forward gains to the specified values.
+   *
+   * <p>The units should be radians for angular systems and meters for linear systems.
+   *
+   * <p>The PID control period is 10ms
+   *
+   * @param s The static gain in volts.
+   * @param v The velocity gain in V/(units/s).
+   * @param a The acceleration gain in V/(units/s²).
+   */
   public void setFF(double s, double v, double a) {
-    sPublisher.set(s);
-    vPublisher.set(v);
-    aPublisher.set(a);
+    m_sPublisher.set(s);
+    m_vPublisher.set(v);
+    m_aPublisher.set(a);
   }
 
-  public void enableContinuousInput(double minimum, double maximum) {
-    continuousMaximumPublisher.set(maximum);
-    continuousMinimumPublisher.set(minimum);
-    continuousPublisher.set(true);
+  /**
+   * Enables continuous input.
+   *
+   * <p>Rather then using the max and min input range as constraints, it considers them to be the
+   * same point and automatically calculates the shortest route to the setpoint.
+   *
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
+   */
+  public void enableContinuousInput(double minimumInput, double maximumInput) {
+    m_continuousMaximumPublisher.set(maximumInput);
+    m_continuousMinimumPublisher.set(minimumInput);
+    m_continuousPublisher.set(true);
   }
 
+  /** Disable continous input mode. */
   public void disableContinuousInput() {
-    continuousPublisher.set(false);
+    m_continuousPublisher.set(false);
+  }
+
+  void close() {
+    m_iPublisher.close();
+    m_dPublisher.close();
+    m_sPublisher.close();
+    m_vPublisher.close();
+    m_aPublisher.close();
+    m_continuousPublisher.close();
+    m_continuousMinimumPublisher.close();
+    m_continuousMaximumPublisher.close();
   }
 }

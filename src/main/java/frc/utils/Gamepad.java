@@ -18,65 +18,65 @@ import edu.wpi.first.wpilibj.event.EventLoop;
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  *
- * <p>Only first party controllers from  are guaranteed to have the correct mapping, and
- * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
- * 3rd party controllers.
+ * <p>Only first party controllers from Generic are guaranteed to have the correct mapping, and only
+ * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
+ * party controllers.
  */
 public class Gamepad extends GenericHID implements Sendable {
   /** Represents a digital button on a Gamepad. */
   public enum Button {
-    /** South button. */
-    kSouth(1),
-    /** East button. */
-    kEast(2),
-    /** West button. */
-    kWest(3),
-    /** North button. */
-    kNorth(4),
+    /** South Face button. */
+    kSouthFace(0),
+    /** East Face button. */
+    kEastFace(1),
+    /** West Face button. */
+    kWestFace(2),
+    /** North Face button. */
+    kNorthFacen(3),
     /** Back button. */
-    kBack(5),
+    kBack(4),
     /** Guide button. */
-    kGuide(6),
+    kGuide(5),
     /** Start button. */
-    kStart(7),
-    /** Left Stick button. */
-    kLeftStick(8),
-    /** Right Stick button. */
-    kRightStick(9),
-    /** Left Shoulder button. */
-    kLeftShoulder(10),
-    /** Right Shoulder button. */
-    kRightShoulder(11),
-    /** DPad Up button. */
-    kDpadUp(12),
-    /** DPad Down button. */
-    kDpadDown(13),
-    /** DPad Left button. */
-    kDpadLeft(14),
-    /** DPad Right button. */
-    kDpadRight(15),
-    /** Misc 1 button. */
-    kMisc1(16),
+    kStart(6),
+    /** Left stick button. */
+    kLeftStick(7),
+    /** Right stick button. */
+    kRightStick(8),
+    /** Right shoulder button. */
+    kLeftShoulder(9),
+    /** Right shoulder button. */
+    kRightShoulder(10),
+    /** D-pad up button. */
+    kDpadUp(11),
+    /** D-pad down button. */
+    kDpadDown(12),
+    /** D-pad left button. */
+    kDpadLeft(13),
+    /** D-pad right button. */
+    kDpadRight(14),
+    /** Miscellaneous 1 button. */
+    kMisc1(15),
     /** Right Paddle 1 button. */
-    kRightPaddle1(17),
+    kRightPaddle1(16),
     /** Left Paddle 1 button. */
-    kLeftPaddle1(18),
+    kLeftPaddle1(17),
     /** Right Paddle 2 button. */
-    kRightPaddle2(19),
+    kRightPaddle2(18),
     /** Left Paddle 2 button. */
-    kLeftPaddle2(20),
+    kLeftPaddle2(19),
     /** Touchpad button. */
-    kTouchpad(21),
-    /** Misc 2 button. */
-    kMisc2(22),
-    /** Misc 3 button. */
-    kMisc3(23),
-    /** Misc 4 button. */
-    kMisc4(24),
-    /** Misc 5 button. */
-    kMisc5(25),
-    /** Misc 6 button. */
-    kMisc6(26);
+    kTouchpad(20),
+    /** Miscellaneous 2 button. */
+    kMisc2(21),
+    /** Miscellaneous 3 button. */
+    kMisc3(22),
+    /** Miscellaneous 4 button. */
+    kMisc4(23),
+    /** Miscellaneous 5 button. */
+    kMisc5(24),
+    /** Miscellaneous 6 button. */
+    kMisc6(25);
 
     /** Button value. */
     public final int value;
@@ -104,10 +104,10 @@ public class Gamepad extends GenericHID implements Sendable {
   public enum Axis {
     /** Left X axis. */
     kLeftX(0),
-    /** Right X axis. */
-    kRightX(2),
     /** Left Y axis. */
     kLeftY(1),
+    /** Right X axis. */
+    kRightX(2),
     /** Right Y axis. */
     kRightY(3),
     /** Left trigger. */
@@ -160,21 +160,21 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the X axis value of right side of the controller. Right is positive.
-   *
-   * @return The axis value.
-   */
-  public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
-  }
-
-  /**
    * Get the Y axis value of left side of the controller. Back is positive.
    *
    * @return The axis value.
    */
   public double getLeftY() {
     return getRawAxis(Axis.kLeftY.value);
+  }
+
+  /**
+   * Get the X axis value of right side of the controller. Right is positive.
+   *
+   * @return The axis value.
+   */
+  public double getRightX() {
+    return getRawAxis(Axis.kRightX.value);
   }
 
   /**
@@ -187,8 +187,8 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Left Trigger axis value of the controller. Note that this axis is bound to the
-   * range of [0, 1] as opposed to the usual [-1, 1].
+   * Get the left trigger axis value of the controller. Note that this axis is bound to the range of
+   * [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
@@ -197,13 +197,13 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the axis value of the Left Trigger. The returned trigger
+   * Constructs an event instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
    * @param threshold the minimum axis value for the returned {@link BooleanEvent} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the Left Trigger's axis exceeds the provided
+   * @return an event instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
@@ -211,11 +211,11 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the axis value of the Left Trigger. The returned trigger
+   * Constructs an event instance around the axis value of the left trigger. The returned trigger
    * will be true when the axis value is greater than 0.5.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the Left Trigger's axis exceeds the provided
+   * @return an event instance that is true when the left trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
@@ -223,8 +223,8 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Right Trigger axis value of the controller. Note that this axis is bound to the
-   * range of [0, 1] as opposed to the usual [-1, 1].
+   * Get the right trigger axis value of the controller. Note that this axis is bound to the range
+   * of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
@@ -233,13 +233,13 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the axis value of the Right Trigger. The returned trigger
+   * Constructs an event instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than {@code threshold}.
    *
    * @param threshold the minimum axis value for the returned {@link BooleanEvent} to be true. This
    *     value should be in the range [0, 1] where 0 is the unpressed state of the axis.
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the Right Trigger's axis exceeds the provided
+   * @return an event instance that is true when the right trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(double threshold, EventLoop loop) {
@@ -247,11 +247,11 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the axis value of the Right Trigger. The returned trigger
+   * Constructs an event instance around the axis value of the right trigger. The returned trigger
    * will be true when the axis value is greater than 0.5.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance that is true when the Right Trigger's axis exceeds the provided
+   * @return an event instance that is true when the right trigger's axis exceeds the provided
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(EventLoop loop) {
@@ -259,155 +259,155 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Read the value of the South button on the controller.
+   * Read the value of the South Face button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getSouthButton() {
-    return getRawButton(Button.kSouth.value);
+  public boolean getSouthFaceButton() {
+    return getRawButton(Button.kSouthFace.value);
   }
 
   /**
-   * Whether the South button was pressed since the last check.
+   * Whether the South Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getSouthButtonPressed() {
-    return getRawButtonPressed(Button.kSouth.value);
+  public boolean getSouthFaceButtonPressed() {
+    return getRawButtonPressed(Button.kSouthFace.value);
   }
 
   /**
-   * Whether the South button was released since the last check.
+   * Whether the South Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getSouthButtonReleased() {
-    return getRawButtonReleased(Button.kSouth.value);
+  public boolean getSouthFaceButtonReleased() {
+    return getRawButtonReleased(Button.kSouthFace.value);
   }
 
   /**
-   * Constructs an event instance around the South button's digital signal.
+   * Constructs an event instance around the South Face button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the South button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the South Face button's digital signal attached to the
+   *     given loop.
    */
-  public BooleanEvent south(EventLoop loop) {
-    return button(Button.kSouth.value, loop);
+  public BooleanEvent southFace(EventLoop loop) {
+    return button(Button.kSouthFace.value, loop);
   }
 
   /**
-   * Read the value of the East button on the controller.
+   * Read the value of the East Face button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getEastButton() {
-    return getRawButton(Button.kEast.value);
+  public boolean getEastFaceButton() {
+    return getRawButton(Button.kEastFace.value);
   }
 
   /**
-   * Whether the East button was pressed since the last check.
+   * Whether the East Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getEastButtonPressed() {
-    return getRawButtonPressed(Button.kEast.value);
+  public boolean getEastFaceButtonPressed() {
+    return getRawButtonPressed(Button.kEastFace.value);
   }
 
   /**
-   * Whether the East button was released since the last check.
+   * Whether the East Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getEastButtonReleased() {
-    return getRawButtonReleased(Button.kEast.value);
+  public boolean getEastFaceButtonReleased() {
+    return getRawButtonReleased(Button.kEastFace.value);
   }
 
   /**
-   * Constructs an event instance around the East button's digital signal.
+   * Constructs an event instance around the East Face button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the East button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the East Face button's digital signal attached to the
+   *     given loop.
    */
-  public BooleanEvent east(EventLoop loop) {
-    return button(Button.kEast.value, loop);
+  public BooleanEvent eastFace(EventLoop loop) {
+    return button(Button.kEastFace.value, loop);
   }
 
   /**
-   * Read the value of the West button on the controller.
+   * Read the value of the West Face button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getWestButton() {
-    return getRawButton(Button.kWest.value);
+  public boolean getWestFaceButton() {
+    return getRawButton(Button.kWestFace.value);
   }
 
   /**
-   * Whether the West button was pressed since the last check.
+   * Whether the West Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getWestButtonPressed() {
-    return getRawButtonPressed(Button.kWest.value);
+  public boolean getWestFaceButtonPressed() {
+    return getRawButtonPressed(Button.kWestFace.value);
   }
 
   /**
-   * Whether the West button was released since the last check.
+   * Whether the West Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getWestButtonReleased() {
-    return getRawButtonReleased(Button.kWest.value);
+  public boolean getWestFaceButtonReleased() {
+    return getRawButtonReleased(Button.kWestFace.value);
   }
 
   /**
-   * Constructs an event instance around the West button's digital signal.
+   * Constructs an event instance around the West Face button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the West button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the West Face button's digital signal attached to the
+   *     given loop.
    */
-  public BooleanEvent west(EventLoop loop) {
-    return button(Button.kWest.value, loop);
+  public BooleanEvent westFace(EventLoop loop) {
+    return button(Button.kWestFace.value, loop);
   }
 
   /**
-   * Read the value of the North button on the controller.
+   * Read the value of the North Face button on the controller.
    *
    * @return The state of the button.
    */
-  public boolean getNorthButton() {
-    return getRawButton(Button.kNorth.value);
+  public boolean getNorthFacenButton() {
+    return getRawButton(Button.kNorthFacen.value);
   }
 
   /**
-   * Whether the North button was pressed since the last check.
+   * Whether the North Face button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getNorthButtonPressed() {
-    return getRawButtonPressed(Button.kNorth.value);
+  public boolean getNorthFacenButtonPressed() {
+    return getRawButtonPressed(Button.kNorthFacen.value);
   }
 
   /**
-   * Whether the North button was released since the last check.
+   * Whether the North Face button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getNorthButtonReleased() {
-    return getRawButtonReleased(Button.kNorth.value);
+  public boolean getNorthFacenButtonReleased() {
+    return getRawButtonReleased(Button.kNorthFacen.value);
   }
 
   /**
-   * Constructs an event instance around the North button's digital signal.
+   * Constructs an event instance around the North Face button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the North button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the North Face button's digital signal attached to the
+   *     given loop.
    */
-  public BooleanEvent north(EventLoop loop) {
-    return button(Button.kNorth.value, loop);
+  public BooleanEvent northFacen(EventLoop loop) {
+    return button(Button.kNorthFacen.value, loop);
   }
 
   /**
@@ -441,8 +441,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Back button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Back button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Back button's digital signal attached to the given
+   *     loop.
    */
   public BooleanEvent back(EventLoop loop) {
     return button(Button.kBack.value, loop);
@@ -479,8 +479,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Guide button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Guide button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Guide button's digital signal attached to the given
+   *     loop.
    */
   public BooleanEvent guide(EventLoop loop) {
     return button(Button.kGuide.value, loop);
@@ -517,15 +517,15 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Start button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Start button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Start button's digital signal attached to the given
+   *     loop.
    */
   public BooleanEvent start(EventLoop loop) {
     return button(Button.kStart.value, loop);
   }
 
   /**
-   * Read the value of the Left Stick button on the controller.
+   * Read the value of the left stick button on the controller.
    *
    * @return The state of the button.
    */
@@ -534,7 +534,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Left Stick button was pressed since the last check.
+   * Whether the left stick button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -543,7 +543,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Left Stick button was released since the last check.
+   * Whether the left stick button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -552,18 +552,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Left Stick button's digital signal.
+   * Constructs an event instance around the left stick button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Left Stick button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the left stick button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
     return button(Button.kLeftStick.value, loop);
   }
 
   /**
-   * Read the value of the Right Stick button on the controller.
+   * Read the value of the right stick button on the controller.
    *
    * @return The state of the button.
    */
@@ -572,7 +572,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Right Stick button was pressed since the last check.
+   * Whether the right stick button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -581,7 +581,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Right Stick button was released since the last check.
+   * Whether the right stick button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -590,18 +590,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Right Stick button's digital signal.
+   * Constructs an event instance around the right stick button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Right Stick button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the right stick button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
     return button(Button.kRightStick.value, loop);
   }
 
   /**
-   * Read the value of the Left Shoulder button on the controller.
+   * Read the value of the right shoulder button on the controller.
    *
    * @return The state of the button.
    */
@@ -610,7 +610,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Left Shoulder button was pressed since the last check.
+   * Whether the right shoulder button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -619,7 +619,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Left Shoulder button was released since the last check.
+   * Whether the right shoulder button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -628,18 +628,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Left Shoulder button's digital signal.
+   * Constructs an event instance around the right shoulder button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Left Shoulder button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the right shoulder button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent leftShoulder(EventLoop loop) {
     return button(Button.kLeftShoulder.value, loop);
   }
 
   /**
-   * Read the value of the Right Shoulder button on the controller.
+   * Read the value of the right shoulder button on the controller.
    *
    * @return The state of the button.
    */
@@ -648,7 +648,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Right Shoulder button was pressed since the last check.
+   * Whether the right shoulder button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -657,7 +657,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Right Shoulder button was released since the last check.
+   * Whether the right shoulder button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -666,18 +666,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Right Shoulder button's digital signal.
+   * Constructs an event instance around the right shoulder button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Right Shoulder button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the right shoulder button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent rightShoulder(EventLoop loop) {
     return button(Button.kRightShoulder.value, loop);
   }
 
   /**
-   * Read the value of the DPad Up button on the controller.
+   * Read the value of the D-pad up button on the controller.
    *
    * @return The state of the button.
    */
@@ -686,7 +686,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Up button was pressed since the last check.
+   * Whether the D-pad up button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -695,7 +695,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Up button was released since the last check.
+   * Whether the D-pad up button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -704,18 +704,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the DPad Up button's digital signal.
+   * Constructs an event instance around the D-pad up button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the DPad Up button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the D-pad up button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent dpadUp(EventLoop loop) {
     return button(Button.kDpadUp.value, loop);
   }
 
   /**
-   * Read the value of the DPad Down button on the controller.
+   * Read the value of the D-pad down button on the controller.
    *
    * @return The state of the button.
    */
@@ -724,7 +724,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Down button was pressed since the last check.
+   * Whether the D-pad down button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -733,7 +733,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Down button was released since the last check.
+   * Whether the D-pad down button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -742,18 +742,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the DPad Down button's digital signal.
+   * Constructs an event instance around the D-pad down button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the DPad Down button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the D-pad down button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent dpadDown(EventLoop loop) {
     return button(Button.kDpadDown.value, loop);
   }
 
   /**
-   * Read the value of the DPad Left button on the controller.
+   * Read the value of the D-pad left button on the controller.
    *
    * @return The state of the button.
    */
@@ -762,7 +762,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Left button was pressed since the last check.
+   * Whether the D-pad left button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -771,7 +771,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Left button was released since the last check.
+   * Whether the D-pad left button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -780,18 +780,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the DPad Left button's digital signal.
+   * Constructs an event instance around the D-pad left button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the DPad Left button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the D-pad left button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent dpadLeft(EventLoop loop) {
     return button(Button.kDpadLeft.value, loop);
   }
 
   /**
-   * Read the value of the DPad Right button on the controller.
+   * Read the value of the D-pad right button on the controller.
    *
    * @return The state of the button.
    */
@@ -800,7 +800,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Right button was pressed since the last check.
+   * Whether the D-pad right button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -809,7 +809,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the DPad Right button was released since the last check.
+   * Whether the D-pad right button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -818,18 +818,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the DPad Right button's digital signal.
+   * Constructs an event instance around the D-pad right button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the DPad Right button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the D-pad right button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent dpadRight(EventLoop loop) {
     return button(Button.kDpadRight.value, loop);
   }
 
   /**
-   * Read the value of the Misc 1 button on the controller.
+   * Read the value of the Miscellaneous 1 button on the controller.
    *
    * @return The state of the button.
    */
@@ -838,7 +838,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 1 button was pressed since the last check.
+   * Whether the Miscellaneous 1 button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -847,7 +847,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 1 button was released since the last check.
+   * Whether the Miscellaneous 1 button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -856,11 +856,11 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Misc 1 button's digital signal.
+   * Constructs an event instance around the Miscellaneous 1 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Misc 1 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Miscellaneous 1 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent misc1(EventLoop loop) {
     return button(Button.kMisc1.value, loop);
@@ -897,8 +897,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Right Paddle 1 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Right Paddle 1 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Right Paddle 1 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent rightPaddle1(EventLoop loop) {
     return button(Button.kRightPaddle1.value, loop);
@@ -935,8 +935,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Left Paddle 1 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Left Paddle 1 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Left Paddle 1 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent leftPaddle1(EventLoop loop) {
     return button(Button.kLeftPaddle1.value, loop);
@@ -973,8 +973,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Right Paddle 2 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Right Paddle 2 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Right Paddle 2 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent rightPaddle2(EventLoop loop) {
     return button(Button.kRightPaddle2.value, loop);
@@ -1011,8 +1011,8 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Left Paddle 2 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Left Paddle 2 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Left Paddle 2 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent leftPaddle2(EventLoop loop) {
     return button(Button.kLeftPaddle2.value, loop);
@@ -1049,15 +1049,15 @@ public class Gamepad extends GenericHID implements Sendable {
    * Constructs an event instance around the Touchpad button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Touchpad button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Touchpad button's digital signal attached to the
+   *     given loop.
    */
   public BooleanEvent touchpad(EventLoop loop) {
     return button(Button.kTouchpad.value, loop);
   }
 
   /**
-   * Read the value of the Misc 2 button on the controller.
+   * Read the value of the Miscellaneous 2 button on the controller.
    *
    * @return The state of the button.
    */
@@ -1066,7 +1066,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 2 button was pressed since the last check.
+   * Whether the Miscellaneous 2 button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -1075,7 +1075,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 2 button was released since the last check.
+   * Whether the Miscellaneous 2 button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -1084,18 +1084,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Misc 2 button's digital signal.
+   * Constructs an event instance around the Miscellaneous 2 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Misc 2 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Miscellaneous 2 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent misc2(EventLoop loop) {
     return button(Button.kMisc2.value, loop);
   }
 
   /**
-   * Read the value of the Misc 3 button on the controller.
+   * Read the value of the Miscellaneous 3 button on the controller.
    *
    * @return The state of the button.
    */
@@ -1104,7 +1104,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 3 button was pressed since the last check.
+   * Whether the Miscellaneous 3 button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -1113,7 +1113,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 3 button was released since the last check.
+   * Whether the Miscellaneous 3 button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -1122,18 +1122,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Misc 3 button's digital signal.
+   * Constructs an event instance around the Miscellaneous 3 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Misc 3 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Miscellaneous 3 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent misc3(EventLoop loop) {
     return button(Button.kMisc3.value, loop);
   }
 
   /**
-   * Read the value of the Misc 4 button on the controller.
+   * Read the value of the Miscellaneous 4 button on the controller.
    *
    * @return The state of the button.
    */
@@ -1142,7 +1142,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 4 button was pressed since the last check.
+   * Whether the Miscellaneous 4 button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -1151,7 +1151,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 4 button was released since the last check.
+   * Whether the Miscellaneous 4 button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -1160,18 +1160,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Misc 4 button's digital signal.
+   * Constructs an event instance around the Miscellaneous 4 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Misc 4 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Miscellaneous 4 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent misc4(EventLoop loop) {
     return button(Button.kMisc4.value, loop);
   }
 
   /**
-   * Read the value of the Misc 5 button on the controller.
+   * Read the value of the Miscellaneous 5 button on the controller.
    *
    * @return The state of the button.
    */
@@ -1180,7 +1180,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 5 button was pressed since the last check.
+   * Whether the Miscellaneous 5 button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -1189,7 +1189,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 5 button was released since the last check.
+   * Whether the Miscellaneous 5 button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -1198,18 +1198,18 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Misc 5 button's digital signal.
+   * Constructs an event instance around the Miscellaneous 5 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Misc 5 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Miscellaneous 5 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent misc5(EventLoop loop) {
     return button(Button.kMisc5.value, loop);
   }
 
   /**
-   * Read the value of the Misc 6 button on the controller.
+   * Read the value of the Miscellaneous 6 button on the controller.
    *
    * @return The state of the button.
    */
@@ -1218,7 +1218,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 6 button was pressed since the last check.
+   * Whether the Miscellaneous 6 button was pressed since the last check.
    *
    * @return Whether the button was pressed since the last check.
    */
@@ -1227,7 +1227,7 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Whether the Misc 6 button was released since the last check.
+   * Whether the Miscellaneous 6 button was released since the last check.
    *
    * @return Whether the button was released since the last check.
    */
@@ -1236,52 +1236,77 @@ public class Gamepad extends GenericHID implements Sendable {
   }
 
   /**
-   * Constructs an event instance around the Misc 6 button's digital signal.
+   * Constructs an event instance around the Miscellaneous 6 button's digital signal.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return an event instance representing the Misc 6 button's digital signal
-   *     attached to the given loop.
+   * @return an event instance representing the Miscellaneous 6 button's digital signal attached to
+   *     the given loop.
    */
   public BooleanEvent misc6(EventLoop loop) {
     return button(Button.kMisc6.value, loop);
   }
 
+  // private double getAxisForSendable(int axis) {
+  //   return DriverStation.getStickAxisIfAvailable(getPort(), axis).orElse(0.0);
+  // }
+
+  // private boolean getButtonForSendable(int button) {
+  //   return DriverStation.getStickButtonIfAvailable(getPort(), button).orElse(false);
+  // }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Gamepad");
-    // builder.addDoubleProperty("LeftTrigger", this::getLeftTriggerAxis, null);
-    // builder.addDoubleProperty("RightTrigger", this::getRightTriggerAxis, null);
-    // builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    // builder.addDoubleProperty("RightX", this::getRightX, null);
-    // builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    // builder.addDoubleProperty("RightY", this::getRightY, null);
-    // builder.addBooleanProperty("South", this::getSouthButton, null);
-    // builder.addBooleanProperty("East", this::getEastButton, null);
-    // builder.addBooleanProperty("West", this::getWestButton, null);
-    // builder.addBooleanProperty("North", this::getNorthButton, null);
-    // builder.addBooleanProperty("Back", this::getBackButton, null);
-    // builder.addBooleanProperty("Guide", this::getGuideButton, null);
-    // builder.addBooleanProperty("Start", this::getStartButton, null);
-    // builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    // builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    // builder.addBooleanProperty("LeftShoulder", this::getLeftShoulderButton, null);
-    // builder.addBooleanProperty("RightShoulder", this::getRightShoulderButton, null);
-    // builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    // builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    // builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    // builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    // builder.addBooleanProperty("Misc1", this::getMisc1Button, null);
-    // builder.addBooleanProperty("RightPaddle1", this::getRightPaddle1Button, null);
-    // builder.addBooleanProperty("LeftPaddle1", this::getLeftPaddle1Button, null);
-    // builder.addBooleanProperty("RightPaddle2", this::getRightPaddle2Button, null);
-    // builder.addBooleanProperty("LeftPaddle2", this::getLeftPaddle2Button, null);
-    // builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
-    // builder.addBooleanProperty("Misc2", this::getMisc2Button, null);
-    // builder.addBooleanProperty("Misc3", this::getMisc3Button, null);
-    // builder.addBooleanProperty("Misc4", this::getMisc4Button, null);
-    // builder.addBooleanProperty("Misc5", this::getMisc5Button, null);
-    // builder.addBooleanProperty("Misc6", this::getMisc6Button, null);
+    // builder.addDoubleProperty(
+    //     "LeftTrigger Axis", () -> getAxisForSendable(Axis.kLeftTrigger.value), null);
+    // builder.addDoubleProperty(
+    //     "RightTrigger Axis", () -> getAxisForSendable(Axis.kRightTrigger.value), null);
+    // builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.kLeftX.value), null);
+    // builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.kLeftY.value), null);
+    // builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.kRightX.value), null);
+    // builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.kRightY.value), null);
+    // builder.addBooleanProperty(
+    //     "SouthFace", () -> getButtonForSendable(Button.kSouthFace.value), null);
+    // builder.addBooleanProperty(
+    //     "EastFace", () -> getButtonForSendable(Button.kEastFace.value), null);
+    // builder.addBooleanProperty(
+    //     "WestFace", () -> getButtonForSendable(Button.kWestFace.value), null);
+    // builder.addBooleanProperty(
+    //     "NorthFacen", () -> getButtonForSendable(Button.kNorthFacen.value), null);
+    // builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.kBack.value), null);
+    // builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.kGuide.value), null);
+    // builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.kStart.value), null);
+    // builder.addBooleanProperty(
+    //     "LeftStick", () -> getButtonForSendable(Button.kLeftStick.value), null);
+    // builder.addBooleanProperty(
+    //     "RightStick", () -> getButtonForSendable(Button.kRightStick.value), null);
+    // builder.addBooleanProperty(
+    //     "LeftShoulder", () -> getButtonForSendable(Button.kLeftShoulder.value), null);
+    // builder.addBooleanProperty(
+    //     "RightShoulder", () -> getButtonForSendable(Button.kRightShoulder.value), null);
+    // builder.addBooleanProperty("DpadUp", () -> getButtonForSendable(Button.kDpadUp.value), null);
+    // builder.addBooleanProperty(
+    //     "DpadDown", () -> getButtonForSendable(Button.kDpadDown.value), null);
+    // builder.addBooleanProperty(
+    //     "DpadLeft", () -> getButtonForSendable(Button.kDpadLeft.value), null);
+    // builder.addBooleanProperty(
+    //     "DpadRight", () -> getButtonForSendable(Button.kDpadRight.value), null);
+    // builder.addBooleanProperty("Misc1", () -> getButtonForSendable(Button.kMisc1.value), null);
+    // builder.addBooleanProperty(
+    //     "RightPaddle1", () -> getButtonForSendable(Button.kRightPaddle1.value), null);
+    // builder.addBooleanProperty(
+    //     "LeftPaddle1", () -> getButtonForSendable(Button.kLeftPaddle1.value), null);
+    // builder.addBooleanProperty(
+    //     "RightPaddle2", () -> getButtonForSendable(Button.kRightPaddle2.value), null);
+    // builder.addBooleanProperty(
+    //     "LeftPaddle2", () -> getButtonForSendable(Button.kLeftPaddle2.value), null);
+    // builder.addBooleanProperty(
+    //     "Touchpad", () -> getButtonForSendable(Button.kTouchpad.value), null);
+    // builder.addBooleanProperty("Misc2", () -> getButtonForSendable(Button.kMisc2.value), null);
+    // builder.addBooleanProperty("Misc3", () -> getButtonForSendable(Button.kMisc3.value), null);
+    // builder.addBooleanProperty("Misc4", () -> getButtonForSendable(Button.kMisc4.value), null);
+    // builder.addBooleanProperty("Misc5", () -> getButtonForSendable(Button.kMisc5.value), null);
+    // builder.addBooleanProperty("Misc6", () -> getButtonForSendable(Button.kMisc6.value), null);
   }
 }
