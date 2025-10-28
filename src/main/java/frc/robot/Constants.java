@@ -24,19 +24,14 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 1; // radians per second
     public static final double kMaxWheelSpeedMetersPerSecond = 1.0;
 
-    public static final int kFrontLeftMotorPort = 0;
-    public static final int kRearLeftMotorPort = 1;
+    public static final int kFrontLeftMotorPort = 1;
+    public static final int kRearLeftMotorPort = 0;
     public static final int kFrontRightMotorPort = 2;
     public static final int kRearRightMotorPort = 3;
 
-    public static final int[] kFrontLeftEncoderPorts = new int[] {0, 1};
-    public static final int[] kRearLeftEncoderPorts = new int[] {2, 3};
-    public static final int[] kFrontRightEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightEncoderPorts = new int[] {6, 7};
-
     public static final boolean kFrontLeftEncoderReversed = false;
-    public static final boolean kRearLeftEncoderReversed = true;
-    public static final boolean kFrontRightEncoderReversed = false;
+    public static final boolean kRearLeftEncoderReversed = false;
+    public static final boolean kFrontRightEncoderReversed = true;
     public static final boolean kRearRightEncoderReversed = true;
 
     public static final double kTrackWidth = 0.5;
@@ -79,12 +74,12 @@ public final class Constants {
     public static final int kShooterMotorPort = 0;
     public static final int kEncoderPort = 0;
     public static final I2C.Port kI2cPort = I2C.Port.kPort0;
-    public static final double kP = 0.15305;
+    public static final double kP = 0.16666;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kS = -0.55216;
-    public static final double kA = 0.21615;
-    public static final double kV = 0.13021;
+    public static final double kS = 0.56532;
+    public static final double kA = 0.17586;
+    public static final double kV = 0.13448;
 
     public static final int kEncoderCPR = 28;
     public static final double kEncoderDistancePerPulse = 1.0 / kEncoderCPR; // Distance units in rotations

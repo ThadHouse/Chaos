@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.RobotContainer;
+import frc.utils.ExpansionHubServo;
 import frc.utils.OctoQuadV3;
 import frc.utils.OctoQuadV3.EncoderData;
 
@@ -11,15 +11,10 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.SparkMini;
 import frc.robot.Constants.ShooterConstants;
@@ -32,13 +27,30 @@ public class Shooter extends SubsystemBase {
     @NotLogged
     SparkMini m_shooterMotor = new SparkMini(ShooterConstants.kShooterMotorPort);
 
+    @NotLogged
     private EncoderData m_encoderData = new EncoderData();
+
+    @NotLogged
+    private ExpansionHubServo m_leftFeederServo = new ExpansionHubServo(0, 0);
+
+    @NotLogged
+    private ExpansionHubServo m_rightFeederServo = new ExpansionHubServo(0, 2);
 
     /** Creates a new Shooter. */
     public Shooter() {
         m_shooterMotor.setInverted(true);
 
         m_octoQuad.resetAllPositions();
+
+        m_leftFeederServo.setContinousRotationMode(true);
+        m_rightFeederServo.setContinousRotationMode(true);
+
+        m_leftFeederServo.setReversed(true);
+
+        m_leftFeederServo.setEnabled(true);
+        m_rightFeederServo.setEnabled(true);
+
+        m_shooterFeedback.setTolerance(3);
     }
 
     @Override
@@ -64,22 +76,28 @@ public class Shooter extends SubsystemBase {
                         .angularVelocity(RotationsPerSecond.of(getShooterVelocity()));
             }, this));
 
+    @NotLogged
     private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
             ShooterConstants.kD);
 
+    @NotLogged
     private final SimpleMotorFeedforward m_shooterFeedforward = new SimpleMotorFeedforward(ShooterConstants.kS,
             ShooterConstants.kV, ShooterConstants.kA);
 
-    public Command runShooter(DoubleSupplier shooterSpeed) {
-        return run(() -> {
-            m_shooterMotor.setVoltage(m_shooterFeedback.calculate(getShooterVelocity(), shooterSpeed.getAsDouble())
-                    + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
+    public void setSpeed(double speed) {
+        m_shooterMotor.setVoltage(m_shooterFeedback.calculate(getShooterVelocity(), speed)
+                    + m_shooterFeedforward.calculate(speed));
+    }
 
-        })
-        .finallyDo(() -> {
-            m_shooterMotor.stopMotor();
-        })
-        .withName("runShooter");
+    public void setFeed(boolean feed) {
+
+        if (feed && m_shooterFeedback.atSetpoint()) {
+            m_leftFeederServo.set(1.0);
+            m_rightFeederServo.set(1.0);
+        } else {
+            m_leftFeederServo.set(0);
+            m_rightFeederServo.set(0);
+        }
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

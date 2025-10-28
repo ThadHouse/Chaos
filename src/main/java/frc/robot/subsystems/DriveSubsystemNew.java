@@ -11,17 +11,13 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.OnboardIMU;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.OnboardIMU.MountOrientation;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.GoBildaPinpoint.GoBildaOdometryPods;
 import frc.utils.ExpansionHubMotor;
@@ -35,8 +31,6 @@ public class DriveSubsystemNew extends SubsystemBase {
   private final ExpansionHubMotor m_rearRightMotor = new ExpansionHubMotor(0, DriveConstants.kRearRightMotorPort);
 
   private final GoBildaPinpoint m_pinpoint = new GoBildaPinpoint(Port.kPort1);
-
-  private final OnboardIMU m_onboardImu = new OnboardIMU(MountOrientation.kLandscape);
 
   // Odometry class for tracking robot pose
   @NotLogged
@@ -64,23 +58,25 @@ public class DriveSubsystemNew extends SubsystemBase {
     m_rearLeftMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
     m_rearRightMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
 
-    m_frontLeftMotor.setReversed(true);
-    m_rearLeftMotor.setReversed(true);
+    m_frontLeftMotor.setReversed(DriveConstants.kFrontLeftEncoderReversed);
+    m_rearLeftMotor.setReversed(DriveConstants.kRearLeftEncoderReversed);
+    m_frontRightMotor.setReversed(DriveConstants.kFrontRightEncoderReversed);
+    m_rearRightMotor.setReversed(DriveConstants.kRearRightEncoderReversed);
 
     m_frontLeftMotor.setEnabled(true);
     m_frontRightMotor.setEnabled(true);
     m_rearLeftMotor.setEnabled(true);
     m_rearRightMotor.setEnabled(true);
 
-    // TODO Reversing
-
     Timer.delay(0.5);
+
+    m_pinpoint.setPosition(Pose2d.kZero.rotateBy(Rotation2d.kPi));
 
     m_pinpoint.update();
 
     m_odometry = new MecanumDriveOdometry(
         DriveConstants.kDriveKinematics,
-        m_onboardImu.getRotation2d(),
+        m_pinpoint.getHeading(),
         new MecanumDriveWheelPositions());
   }
 
@@ -88,7 +84,7 @@ public class DriveSubsystemNew extends SubsystemBase {
   public void periodic() {
     m_pinpoint.update();
     // Update the odometry in the periodic block
-    m_odometry.update(m_onboardImu.getRotation2d(), getCurrentWheelDistances());
+    m_odometry.update(m_pinpoint.getHeading(), getCurrentWheelDistances());
   }
 
   /**
@@ -108,7 +104,7 @@ public class DriveSubsystemNew extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     m_pinpoint.setPosition(pose);
     m_odometry.resetPosition(
-        m_onboardImu.getRotation2d(),
+        m_pinpoint.getHeading(),
         getCurrentWheelDistances(),
         pose);
   }
@@ -196,19 +192,15 @@ public class DriveSubsystemNew extends SubsystemBase {
     return m_odometry.getPose().getRotation().getRadians();
   }
 
-  public double getRawHeading() {
-    return m_onboardImu.getYawRadians();
-  }
-
-  public double getTurnRate() {
-    return m_onboardImu.getGyroRateX();
-  }
-
   public double getPinpointTurnRate() {
     return m_pinpoint.getHeadingVelocity().in(RadiansPerSecond);
   }
 
   public double getPinpointHeading() {
     return m_pinpoint.getHeading().getRadians();
+  }
+
+  public Rotation2d getPinpointRotation2d() {
+    return m_pinpoint.getHeading();
   }
 }
