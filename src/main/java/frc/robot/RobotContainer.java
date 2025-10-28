@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystemNew;
 import frc.robot.subsystems.Shooter;
-import frc.utils.ExpansionHub;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import static edu.wpi.first.units.Units.Amps;
 
@@ -36,15 +36,7 @@ public class RobotContainer {
     private final Shooter m_shooter = new Shooter();
 
     @NotLogged
-    private final ExpansionHub m_expansionHub = new ExpansionHub(0);
-
-    @NotLogged
     private final AnalogInput m_currentReading = new AnalogInput(5);
-
-    @Logged
-    public boolean isExpansionHubConnected() {
-        return m_expansionHub.isHubConnected();
-    }
 
     @Logged
     public Current getRobotCurrent() {
@@ -57,10 +49,6 @@ public class RobotContainer {
     // The driver's controller
     private final CommandXboxController m_driverController = new CommandXboxController(
             OIConstants.kDriverControllerPort);
-
-    // @NotLogged
-    // private final CommandGamepad m_driveGp = new
-    // CommandGamepad(OIConstants.kDriverControllerPort);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -80,6 +68,23 @@ public class RobotContainer {
                                 true),
                         m_robotDrive));
 
+        m_driverController
+                .a()
+                .and(m_driverController.start())
+                .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        m_driverController
+                .b()
+                .and(m_driverController.start())
+                .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        m_driverController
+                .x()
+                .and(m_driverController.start())
+                .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        m_driverController
+                .y()
+                .and(m_driverController.start())
+                .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
     }
 
     /**
@@ -96,6 +101,23 @@ public class RobotContainer {
             m_shooter.setSpeed(m_driverController.getHID().getRightBumperButton() ? 40 : 0);
             m_shooter.setFeed(m_driverController.getHID().getLeftBumperButton() ? true : false);
         }, m_shooter));
+
+        m_driverController
+                .a()
+                .and(m_driverController.back())
+                .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        m_driverController
+                .b()
+                .and(m_driverController.back())
+                .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        m_driverController
+                .x()
+                .and(m_driverController.back())
+                .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        m_driverController
+                .y()
+                .and(m_driverController.back())
+                .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
 
     /**

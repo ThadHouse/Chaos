@@ -3,9 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.utils.ExpansionHubMotor;
 import frc.utils.ExpansionHubServo;
-import frc.utils.OctoQuadV3;
-import frc.utils.OctoQuadV3.EncoderData;
 
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -15,32 +14,27 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.SparkMini;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.ShooterConstants;
 
 @Logged
 public class Shooter extends SubsystemBase {
-    @NotLogged
-    OctoQuadV3 m_octoQuad = new OctoQuadV3(ShooterConstants.kI2cPort);
 
     @NotLogged
-    SparkMini m_shooterMotor = new SparkMini(ShooterConstants.kShooterMotorPort);
+    ExpansionHubMotor m_shooterMotor = new ExpansionHubMotor(1, ShooterConstants.kShooterMotorPort);
 
     @NotLogged
-    private EncoderData m_encoderData = new EncoderData();
+    private ExpansionHubServo m_leftFeederServo = new ExpansionHubServo(1, 0);
 
     @NotLogged
-    private ExpansionHubServo m_leftFeederServo = new ExpansionHubServo(0, 0);
-
-    @NotLogged
-    private ExpansionHubServo m_rightFeederServo = new ExpansionHubServo(0, 2);
+    private ExpansionHubServo m_rightFeederServo = new ExpansionHubServo(1, 2);
 
     /** Creates a new Shooter. */
     public Shooter() {
-        m_shooterMotor.setInverted(true);
-
-        m_octoQuad.resetAllPositions();
+        m_shooterMotor.setReversed(true);
+        m_shooterMotor.setDistancePerCount(ShooterConstants.kEncoderDistancePerPulse);
+        m_shooterMotor.setEnabled(true);
 
         m_leftFeederServo.setContinousRotationMode(true);
         m_rightFeederServo.setContinousRotationMode(true);
@@ -53,25 +47,32 @@ public class Shooter extends SubsystemBase {
         m_shooterFeedback.setTolerance(3);
     }
 
-    @Override
-    public void periodic() {
-        if (!m_octoQuad.readAllDataWithoutLocalizer(m_encoderData)) {
-            System.out.println("Error reading octoquad data");
-        }
-    }
-
     public double getShooterVelocity() {
-        return m_encoderData.velocities[ShooterConstants.kEncoderPort] * ShooterConstants.kEncoderDistancePerPulse * ShooterConstants.kEncoderSampleRate * -1;
+        return m_shooterMotor.getEncoderVelocity();
     }
 
     public double getShooterPosition() {
-        return m_encoderData.positions[ShooterConstants.kEncoderPort] * ShooterConstants.kEncoderDistancePerPulse * -1;
+        return m_shooterMotor.getEncoderPosition();
     }
 
+    public Current getShooterCurrent() {
+        return m_shooterMotor.getCurrent();
+    }
+
+    public boolean isHubConnected() {
+        return m_shooterMotor.isHubConnected();
+    }
+
+    @NotLogged
+    private Voltage m_lastVoltage = Volts.of(0);
+
     private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(m_shooterMotor::setVoltage, log -> {
+            new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(voltage -> {
+                m_shooterMotor.setVoltage(voltage);
+                m_lastVoltage = voltage;
+            }, log -> {
                 log.motor("shooter-wheel")
-                        .voltage(Volts.of(m_shooterMotor.get() * RobotController.getBatteryVoltage()))
+                        .voltage(m_lastVoltage)
                         .angularPosition(Rotations.of(getShooterPosition()))
                         .angularVelocity(RotationsPerSecond.of(getShooterVelocity()));
             }, this));
@@ -85,8 +86,8 @@ public class Shooter extends SubsystemBase {
             ShooterConstants.kV, ShooterConstants.kA);
 
     public void setSpeed(double speed) {
-        m_shooterMotor.setVoltage(m_shooterFeedback.calculate(getShooterVelocity(), speed)
-                    + m_shooterFeedforward.calculate(speed));
+        m_shooterMotor.setVoltage(Volts.of(m_shooterFeedback.calculate(getShooterVelocity(), speed)
+                + m_shooterFeedforward.calculate(speed)));
     }
 
     public void setFeed(boolean feed) {
