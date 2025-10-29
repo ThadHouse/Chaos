@@ -24,6 +24,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   private static final int kVoltageMode = 1;
   private static final int kPositionMode = 2;
   private static final int kVelocityMode = 3;
+  private static final int kFollowerMode = 4;
 
   private ExpansionHub m_hub;
   private final int m_channel;
@@ -286,5 +287,9 @@ public class ExpansionHubMotor implements AutoCloseable {
    */
   public ExpansionHubPidConstants getPositionPidConstants() {
     return m_positionPidConstants;
+  }
+
+  public void follow(ExpansionHubMotor toFollow) {
+    m_modePublisher.set(kFollowerMode);
   }
 }
