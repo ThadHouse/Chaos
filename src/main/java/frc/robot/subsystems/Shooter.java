@@ -12,8 +12,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.ShooterConstants;
@@ -44,7 +42,9 @@ public class Shooter extends SubsystemBase {
         m_leftFeederServo.setEnabled(true);
         m_rightFeederServo.setEnabled(true);
 
-        m_shooterFeedback.setTolerance(3);
+        var pidConstants = m_shooterMotor.getVelocityPidConstants();
+        pidConstants.setPID(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD);
+        pidConstants.setFF(ShooterConstants.kS, ShooterConstants.kV, ShooterConstants.kA);
     }
 
     public double getShooterVelocity() {
@@ -77,22 +77,20 @@ public class Shooter extends SubsystemBase {
                         .angularVelocity(RotationsPerSecond.of(getShooterVelocity()));
             }, this));
 
-    @NotLogged
-    private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, ShooterConstants.kI,
-            ShooterConstants.kD);
-
-    @NotLogged
-    private final SimpleMotorFeedforward m_shooterFeedforward = new SimpleMotorFeedforward(ShooterConstants.kS,
-            ShooterConstants.kV, ShooterConstants.kA);
+    private double m_lastSpeed = 0.0;
 
     public void setSpeed(double speed) {
-        m_shooterMotor.setVoltage(Volts.of(m_shooterFeedback.calculate(getShooterVelocity(), speed)
-                + m_shooterFeedforward.calculate(speed)));
+        m_lastSpeed = speed;
+        m_shooterMotor.setVelocitySetpoint(speed);
     }
 
     public void setFeed(boolean feed) {
+        var error = getShooterVelocity() - m_lastSpeed;
+        if (Math.abs(error) > 2) {
+            feed = false;
+        }
 
-        if (feed && m_shooterFeedback.atSetpoint()) {
+        if (feed) {
             m_leftFeederServo.set(1.0);
             m_rightFeederServo.set(1.0);
         } else {

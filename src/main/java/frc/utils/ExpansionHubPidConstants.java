@@ -11,7 +11,7 @@ import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.SystemServer;
 
 /** This class contains PID constants for an ExpansionHub motor. */
-class ExpansionHubPidConstants {
+public class ExpansionHubPidConstants {
   private final DoublePublisher m_pPublisher;
   private final DoublePublisher m_iPublisher;
   private final DoublePublisher m_dPublisher;
