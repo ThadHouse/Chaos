@@ -12,7 +12,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
@@ -23,6 +22,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.GoBildaPinpoint.EncoderDirection;
 import frc.robot.subsystems.GoBildaPinpoint.GoBildaOdometryPods;
 import frc.utils.ExpansionHubMotor;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,6 +55,7 @@ public class DriveSubsystemNew extends SubsystemBase {
 
     m_pinpoint.setEncoderResolution(GoBildaOdometryPods.goBILDA_4_BAR_POD);
     m_pinpoint.setOffsets(DriveConstants.kXOffset, DriveConstants.kYOffset);
+    m_pinpoint.setEncoderDirections(EncoderDirection.FORWARD, EncoderDirection.REVERSED);
 
     m_frontLeftMotor.setReversed(DriveConstants.kFrontLeftEncoderReversed);
     m_rearLeftMotor.setReversed(DriveConstants.kRearLeftEncoderReversed);
@@ -67,8 +68,6 @@ public class DriveSubsystemNew extends SubsystemBase {
     setPids(m_rearRightMotor);
 
     Timer.delay(0.5);
-
-    m_pinpoint.setPosition(Pose2d.kZero.rotateBy(Rotation2d.kPi));
 
     m_pinpoint.update();
   }
@@ -180,10 +179,6 @@ public class DriveSubsystemNew extends SubsystemBase {
 
   public Rotation2d getHeading() {
     return m_pinpoint.getHeading();
-  }
-
-  public Translation2d getTranslation() {
-    return new Translation2d(m_pinpoint.getPosX(), m_pinpoint.getPosY());
   }
 
   @NotLogged
