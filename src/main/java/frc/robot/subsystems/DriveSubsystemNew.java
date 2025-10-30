@@ -12,6 +12,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
@@ -53,7 +54,7 @@ public class DriveSubsystemNew extends SubsystemBase {
     m_pinpoint.resetPosAndIMU();
 
     m_pinpoint.setEncoderResolution(GoBildaOdometryPods.goBILDA_4_BAR_POD);
-    // TODO set x and y on pinpoint
+    m_pinpoint.setOffsets(DriveConstants.kXOffset, DriveConstants.kYOffset);
 
     m_frontLeftMotor.setReversed(DriveConstants.kFrontLeftEncoderReversed);
     m_rearLeftMotor.setReversed(DriveConstants.kRearLeftEncoderReversed);
@@ -179,6 +180,10 @@ public class DriveSubsystemNew extends SubsystemBase {
 
   public Rotation2d getHeading() {
     return m_pinpoint.getHeading();
+  }
+
+  public Translation2d getTranslation() {
+    return new Translation2d(m_pinpoint.getPosX(), m_pinpoint.getPosY());
   }
 
   @NotLogged

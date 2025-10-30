@@ -269,9 +269,9 @@ public class GoBildaPinpoint {
      * @param yOffset how far forward from the center of the robot is the Y (Strafe)
      *                pod? forward increases
      */
-    public void setOffsets(double xOffset, double yOffset) {
-        writeFloat(Register.X_POD_OFFSET, (float) xOffset);
-        writeFloat(Register.Y_POD_OFFSET, (float) yOffset);
+    public void setOffsets(Distance xOffset, Distance yOffset) {
+        writeFloat(Register.X_POD_OFFSET, (float) xOffset.in(Millimeters));
+        writeFloat(Register.Y_POD_OFFSET, (float) yOffset.in(Millimeters));
     }
 
     /**
@@ -554,8 +554,8 @@ public class GoBildaPinpoint {
      *
      * @return the user-set offset for the X (forward) pod
      */
-    public float getXOffset() {
-        return readFloat(Register.X_POD_OFFSET);
+    public Distance getXOffset() {
+        return Millimeters.of(readFloat(Register.X_POD_OFFSET));
     }
 
     /**
@@ -563,8 +563,8 @@ public class GoBildaPinpoint {
      *
      * @return the user-set offset for the Y (strafe) pod
      */
-    public float getYOffset() {
-        return readFloat(Register.Y_POD_OFFSET);
+    public Distance getYOffset() {
+        return Millimeters.of(readFloat(Register.Y_POD_OFFSET));
     }
 
     /**
@@ -576,12 +576,4 @@ public class GoBildaPinpoint {
                 getPosY(),
                 getHeading());
     }
-
-    // /**
-    //  * @return a Pose2D containing the estimated velocity of the robot, velocity is
-    //  *         unit per second
-    //  */
-    // public Pose2d getVelocity() {
-    //     return new Pose2d(getVelX().in(MetersPerSecond), getVelY().in(MetersPerSecond),  getHeadingVelocity().in(RadiansPerSecond));
-    // }
 }

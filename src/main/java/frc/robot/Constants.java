@@ -69,8 +69,8 @@ public final class Constants {
 
     public static final double kP = 2.7238;
 
-    public static final Distance kXOffset = Millimeter.of(120); // 15 holes * 8mm per hole
-    public static final Distance kYOffset = Millimeter.of(64); // 8 holes * 8mm per hole
+    public static final Distance kYOffset = Millimeter.of(120); // 15 holes * 8mm per hole
+    public static final Distance kXOffset = Millimeter.of(92); // 11.5 holes * 8mm per hole
   }
 
   public static final class OIConstants {
