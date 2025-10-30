@@ -4,10 +4,19 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Millimeter;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.I2C;
 
 /**
@@ -20,9 +29,9 @@ import edu.wpi.first.wpilibj.I2C;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final double kMaxSpeedMetersPerSecond = 0.6;
-    public static final double kMaxAngularSpeed = 1; // radians per second
-    public static final double kMaxWheelSpeedMetersPerSecond = 1.0;
+    public static final LinearVelocity kMaxSpeed = MetersPerSecond.of(0.6);
+    public static final AngularVelocity kMaxAngularSpeed = RadiansPerSecond.of(1);
+    public static final LinearVelocity kMaxWheelSpeed = MetersPerSecond.of(1.0);
 
     public static final int kFrontLeftMotorPort = 1;
     public static final int kRearLeftMotorPort = 0;
@@ -34,17 +43,19 @@ public final class Constants {
     public static final boolean kFrontRightEncoderReversed = true;
     public static final boolean kRearRightEncoderReversed = true;
 
-    public static final double kTrackWidth = 0.5;
+    public static final Distance kTrackWidth = Millimeter.of(416);
+    public static final Distance kTrackWidthToCenter = kTrackWidth.div(2);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.7;
+    public static final Distance kWheelBase = Millimeter.of(336); // 14 large holes * 24mm per large hole
+    public static final Distance kWheelBaseToCenter = kWheelBase.div(2);
     // Distance between centers of front and back wheels on robot
 
     public static final MecanumDriveKinematics kDriveKinematics =
         new MecanumDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+            new Translation2d(kWheelBaseToCenter, kTrackWidthToCenter),
+            new Translation2d(kWheelBaseToCenter, kTrackWidthToCenter.unaryMinus()),
+            new Translation2d(kWheelBaseToCenter.unaryMinus(), kTrackWidthToCenter),
+            new Translation2d(kWheelBaseToCenter.unaryMinus(), kTrackWidthToCenter.unaryMinus()));
 
     public static final double kEncoderCPR = 537.7;
     public static final double kWheelDiameterMeters = 0.15;
@@ -52,17 +63,14 @@ public final class Constants {
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / kEncoderCPR;
 
-    public static final double kEncoderSampleRate = 1000.0 / 50;
+    public static final double kS = 0.43007;
+    public static final double kV = 4.9336;
+    public static final double kA = 0.71773;
 
-    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The SysId tool provides a convenient method for obtaining these values for your robot.
-    public static final SimpleMotorFeedforward kFeedforward =
-        new SimpleMotorFeedforward(0.43007, 4.9336, 0.71773);
+    public static final double kP = 2.7238;
 
-    // Example value only - as above, this must be tuned for your drive!
-    public static final double kPDrive = 2.7238;
+    public static final Distance kXOffset = Millimeter.of(120); // 15 holes * 8mm per hole
+    public static final Distance kYOffset = Millimeter.of(64); // 8 holes * 8mm per hole
   }
 
   public static final class OIConstants {
@@ -83,23 +91,16 @@ public final class Constants {
 
     public static final int kEncoderCPR = 28;
     public static final double kEncoderDistancePerPulse = 1.0 / kEncoderCPR; // Distance units in rotations
-
-    public static final double kEncoderSampleRate = 1000.0 / 50;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final LinearVelocity kMaxSpeedMetersPerSecond = MetersPerSecond.of(3);
+    public static final LinearAcceleration kMaxAccelerationMetersPerSecondSquared = MetersPerSecondPerSecond.of(3);
+    public static final AngularVelocity kMaxAngularSpeedRadiansPerSecond = RadiansPerSecond.of( Math.PI);
+    public static final AngularAcceleration kMaxAngularSpeedRadiansPerSecondSquared = RadiansPerSecondPerSecond.of(Math.PI);
 
     public static final double kPXController = 0.5;
     public static final double kPYController = 0.5;
     public static final double kPThetaController = 0.5;
-
-    // Constraint for the motion profilied robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 }

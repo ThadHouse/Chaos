@@ -61,7 +61,7 @@ public class RobotContainer {
                 // A split-stick arcade command, with forward/backward controlled by the left
                 // hand, and turning controlled by the right.
                 new RunCommand(
-                        () -> m_robotDrive.drive(
+                        () -> m_robotDrive.driveJoysticks(
                                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),

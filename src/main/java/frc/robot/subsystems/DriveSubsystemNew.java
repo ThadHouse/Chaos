@@ -6,20 +6,18 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
@@ -39,14 +37,16 @@ public class DriveSubsystemNew extends SubsystemBase {
 
   private final GoBildaPinpoint m_pinpoint = new GoBildaPinpoint(Port.kPort1);
 
-  // Odometry class for tracking robot pose
-  @NotLogged
-  private MecanumDriveOdometry m_odometry;
+  private static void setPids(ExpansionHubMotor motor) {
+    motor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
 
-  private final PIDController m_frontLeftPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
-  private final PIDController m_frontRightPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
-  private final PIDController m_backLeftPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
-  private final PIDController m_backRightPIDController = new PIDController(DriveConstants.kPDrive, 0, 0);
+    var pidConstants = motor.getVelocityPidConstants();
+    pidConstants.setPID(DriveConstants.kP, 0, 0);
+    pidConstants.setFF(DriveConstants.kS, DriveConstants.kV, DriveConstants.kA);
+
+    motor.resetEncoder();
+    motor.setEnabled(true);
+  }
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystemNew() {
@@ -55,43 +55,26 @@ public class DriveSubsystemNew extends SubsystemBase {
     m_pinpoint.setEncoderResolution(GoBildaOdometryPods.goBILDA_4_BAR_POD);
     // TODO set x and y on pinpoint
 
-    m_frontLeftMotor.resetEncoder();
-    m_frontRightMotor.resetEncoder();
-    m_rearLeftMotor.resetEncoder();
-    m_rearRightMotor.resetEncoder();
-
-    m_frontLeftMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
-    m_frontRightMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
-    m_rearLeftMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
-    m_rearRightMotor.setDistancePerCount(DriveConstants.kEncoderDistancePerPulse);
-
     m_frontLeftMotor.setReversed(DriveConstants.kFrontLeftEncoderReversed);
     m_rearLeftMotor.setReversed(DriveConstants.kRearLeftEncoderReversed);
     m_frontRightMotor.setReversed(DriveConstants.kFrontRightEncoderReversed);
     m_rearRightMotor.setReversed(DriveConstants.kRearRightEncoderReversed);
 
-    m_frontLeftMotor.setEnabled(true);
-    m_frontRightMotor.setEnabled(true);
-    m_rearLeftMotor.setEnabled(true);
-    m_rearRightMotor.setEnabled(true);
+    setPids(m_frontLeftMotor);
+    setPids(m_frontRightMotor);
+    setPids(m_rearLeftMotor);
+    setPids(m_rearRightMotor);
 
     Timer.delay(0.5);
 
     m_pinpoint.setPosition(Pose2d.kZero.rotateBy(Rotation2d.kPi));
 
     m_pinpoint.update();
-
-    m_odometry = new MecanumDriveOdometry(
-        DriveConstants.kDriveKinematics,
-        m_pinpoint.getHeading(),
-        new MecanumDriveWheelPositions());
   }
 
   @Override
   public void periodic() {
     m_pinpoint.update();
-    // Update the odometry in the periodic block
-    m_odometry.update(m_pinpoint.getHeading(), getCurrentWheelDistances());
   }
 
   public Current getFrontLeftCurrent() {
@@ -114,50 +97,21 @@ public class DriveSubsystemNew extends SubsystemBase {
     return m_frontLeftMotor.isHubConnected();
   }
 
-  /**
-   * Returns the currently-estimated pose of the robot.
-   *
-   * @return The pose.
-   */
   public Pose2d getPose() {
-    return m_odometry.getPose();
-  }
-
-  public Pose2d getPinpointPose() {
     return m_pinpoint.getPosition();
   }
 
   // Reset the odometry to the specified pose
   public void resetOdometry(Pose2d pose) {
     m_pinpoint.setPosition(pose);
-    m_odometry.resetPosition(
-        m_pinpoint.getHeading(),
-        getCurrentWheelDistances(),
-        pose);
   }
 
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
 
-    final double frontLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontLeft, speeds.frontLeft);
-    final double frontRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.frontRight, speeds.frontRight);
-    final double backLeftFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearLeft, speeds.rearLeft);
-    final double backRightFeedforward = DriveConstants.kFeedforward.calculate(speeds.rearRight, speeds.rearRight);
-
-    MecanumDriveWheelSpeeds currentSpeeds = getCurrentWheelSpeeds();
-
-    final double frontLeftOutput = m_frontLeftPIDController.calculate(
-        currentSpeeds.frontLeft, speeds.frontLeft);
-    final double frontRightOutput = m_frontRightPIDController.calculate(
-        currentSpeeds.frontRight, speeds.frontRight);
-    final double backLeftOutput = m_backLeftPIDController.calculate(
-        currentSpeeds.rearLeft, speeds.rearLeft);
-    final double backRightOutput = m_backRightPIDController.calculate(
-        currentSpeeds.rearRight, speeds.rearRight);
-
-    m_frontLeftMotor.setVoltage(Volt.of(frontLeftOutput + frontLeftFeedforward));
-    m_frontRightMotor.setVoltage(Volt.of(frontRightOutput + frontRightFeedforward));
-    m_rearLeftMotor.setVoltage(Volt.of(backLeftOutput + backLeftFeedforward));
-    m_rearRightMotor.setVoltage(Volt.of(backRightOutput + backRightFeedforward));
+    m_frontLeftMotor.setVelocitySetpoint(speeds.frontLeft);
+    m_frontRightMotor.setVelocitySetpoint(speeds.frontRight);
+    m_rearLeftMotor.setVelocitySetpoint(speeds.rearLeft);
+    m_rearRightMotor.setVelocitySetpoint(speeds.rearRight);
   }
 
   /**
@@ -172,20 +126,24 @@ public class DriveSubsystemNew extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+  public void drive(LinearVelocity xSpeed, LinearVelocity ySpeed, AngularVelocity rot, boolean fieldRelative) {
 
-    var chassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
+    var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
     if (fieldRelative) {
-      chassisSpeeds = chassisSpeeds.toRobotRelative(m_odometry.getPose().getRotation());
+      chassisSpeeds = chassisSpeeds.toRobotRelative(getHeading());
     }
     chassisSpeeds = chassisSpeeds.discretize(0.02);
     var mecanumStates = DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds);
-    mecanumStates = mecanumStates.desaturate(DriveConstants.kMaxWheelSpeedMetersPerSecond);
+    mecanumStates = mecanumStates.desaturate(DriveConstants.kMaxWheelSpeed);
     setSpeeds(mecanumStates);
+  }
+
+  public void driveJoysticks(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    var xSpeedDelivered = DriveConstants.kMaxSpeed.times(xSpeed);
+    var ySpeedDelivered = DriveConstants.kMaxSpeed.times(ySpeed);
+    var rotDelivered = DriveConstants.kMaxAngularSpeed.times(rot);
+
+    drive(xSpeedDelivered, ySpeedDelivered, rotDelivered, fieldRelative);
   }
 
   /**
@@ -215,19 +173,11 @@ public class DriveSubsystemNew extends SubsystemBase {
         m_rearRightMotor.getEncoderPosition());
   }
 
-  public double getHeading() {
-    return m_odometry.getPose().getRotation().getRadians();
+  public AngularVelocity getTurnRate() {
+    return m_pinpoint.getHeadingVelocity();
   }
 
-  public double getPinpointTurnRate() {
-    return m_pinpoint.getHeadingVelocity().in(RadiansPerSecond);
-  }
-
-  public double getPinpointHeading() {
-    return m_pinpoint.getHeading().getRadians();
-  }
-
-  public Rotation2d getPinpointRotation2d() {
+  public Rotation2d getHeading() {
     return m_pinpoint.getHeading();
   }
 
