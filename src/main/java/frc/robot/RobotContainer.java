@@ -13,14 +13,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystemNew;
 import frc.robot.subsystems.Shooter;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import static edu.wpi.first.units.Units.Amps;
+
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.button.CommandGamepad;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -47,7 +44,7 @@ public class RobotContainer {
 
     @NotLogged
     // The driver's controller
-    private final CommandXboxController m_driverController = new CommandXboxController(
+    private final CommandGamepad m_driverController = new CommandGamepad(
             OIConstants.kDriverControllerPort);
 
     /**
@@ -57,33 +54,33 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        m_robotDrive.setDefaultCommand(
-                // A split-stick arcade command, with forward/backward controlled by the left
-                // hand, and turning controlled by the right.
-                new RunCommand(
-                        () -> m_robotDrive.driveJoysticks(
-                                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                                true),
-                        m_robotDrive));
+        m_robotDrive.setDefaultCommand(m_robotDrive.runRepeatedly(() -> {
+            m_robotDrive.driveJoysticks(
+                    -MathUtil.applyDeadband(m_driverController.getLeftY(),
+                            OIConstants.kDriveDeadband),
+                    -MathUtil.applyDeadband(m_driverController.getLeftX(),
+                            OIConstants.kDriveDeadband),
+                    -MathUtil.applyDeadband(m_driverController.getRightX(),
+                            OIConstants.kDriveDeadband),
+                    true);
+        }).withPriority(Command.LOWEST_PRIORITY).named("Drive Default"));
 
-        m_driverController
-                .a()
-                .and(m_driverController.start())
-                .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        m_driverController
-                .b()
-                .and(m_driverController.start())
-                .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        m_driverController
-                .x()
-                .and(m_driverController.start())
-                .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        m_driverController
-                .y()
-                .and(m_driverController.start())
-                .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        // m_driverController
+        // .a()
+        // .and(m_driverController.start())
+        // .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        // m_driverController
+        // .b()
+        // .and(m_driverController.start())
+        // .whileTrue(m_robotDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        // m_driverController
+        // .x()
+        // .and(m_driverController.start())
+        // .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        // m_driverController
+        // .y()
+        // .and(m_driverController.start())
+        // .whileTrue(m_robotDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     }
 
@@ -97,27 +94,27 @@ public class RobotContainer {
      * {@link JoystickButton}.
      */
     private void configureButtonBindings() {
-        m_shooter.setDefaultCommand(new RunCommand(() -> {
-            m_shooter.setSpeed(m_driverController.getHID().getRightBumperButton() ? 40 : 0);
-            m_shooter.setFeed(m_driverController.getHID().getLeftBumperButton() ? true : false);
-        }, m_shooter));
+        m_shooter.setDefaultCommand(m_shooter.runRepeatedly(() -> {
+            m_shooter.setSpeed(m_driverController.getHID().getRightShoulderButton() ? 40 : 0);
+            m_shooter.setFeed(m_driverController.getHID().getLeftShoulderButton() ? true : false);
+        }).withPriority(Command.LOWEST_PRIORITY).named("Default Shooter"));
 
-        m_driverController
-                .a()
-                .and(m_driverController.back())
-                .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        m_driverController
-                .b()
-                .and(m_driverController.back())
-                .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        m_driverController
-                .x()
-                .and(m_driverController.back())
-                .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        m_driverController
-                .y()
-                .and(m_driverController.back())
-                .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        // m_driverController
+        // .a()
+        // .and(m_driverController.back())
+        // .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        // m_driverController
+        // .b()
+        // .and(m_driverController.back())
+        // .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        // m_driverController
+        // .x()
+        // .and(m_driverController.back())
+        // .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        // m_driverController
+        // .y()
+        // .and(m_driverController.back())
+        // .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
 
     /**
@@ -126,6 +123,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return Commands.none();
+        return Command.noRequirements().executing((cr) -> {
+            cr.park();
+        }).named("Empty Autonomous Command");
     }
 }

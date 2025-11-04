@@ -4,12 +4,13 @@
 
 package frc.robot;
 
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.Scheduler;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -35,6 +36,8 @@ public class Robot extends TimedRobot {
     Epilogue.bind(this);
   }
 
+  int count = 0;
+
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
@@ -48,7 +51,7 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
+    Scheduler.getDefault().run();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -72,7 +75,7 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+      Scheduler.getDefault().schedule(m_autonomousCommand);
     }
   }
 
@@ -87,7 +90,7 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+      Scheduler.getDefault().cancel(m_autonomousCommand);
     }
   }
 
@@ -98,7 +101,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
+    Scheduler.getDefault().cancelAll();
   }
 
   /** This function is called periodically during test mode. */

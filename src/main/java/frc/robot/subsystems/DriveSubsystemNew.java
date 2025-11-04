@@ -4,12 +4,10 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import org.wpilib.commands3.Mechanism;
+import org.wpilib.commands3.Scheduler;
 
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -18,19 +16,15 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.ExpansionHubMotor;
 import edu.wpi.first.wpilibj.I2C.Port;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.GoBildaPinpoint.EncoderDirection;
 import frc.robot.subsystems.GoBildaPinpoint.GoBildaOdometryPods;
-import frc.utils.ExpansionHubMotor;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 @Logged
-public class DriveSubsystemNew extends SubsystemBase {
+public class DriveSubsystemNew extends Mechanism {
   private final ExpansionHubMotor m_frontLeftMotor = new ExpansionHubMotor(0, DriveConstants.kFrontLeftMotorPort);
   private final ExpansionHubMotor m_frontRightMotor = new ExpansionHubMotor(0, DriveConstants.kFrontRightMotorPort);
   private final ExpansionHubMotor m_rearLeftMotor = new ExpansionHubMotor(0, DriveConstants.kRearLeftMotorPort);
@@ -70,9 +64,10 @@ public class DriveSubsystemNew extends SubsystemBase {
     Timer.delay(0.5);
 
     m_pinpoint.update();
+
+    Scheduler.getDefault().addPeriodic(this::periodic);
   }
 
-  @Override
   public void periodic() {
     m_pinpoint.update();
   }
@@ -181,50 +176,50 @@ public class DriveSubsystemNew extends SubsystemBase {
     return m_pinpoint.getHeading();
   }
 
-  @NotLogged
-  private Voltage m_lastVoltage = Volts.of(0);
+  // @NotLogged
+  // private Voltage m_lastVoltage = Volts.of(0);
 
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(
-          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(),
-          new SysIdRoutine.Mechanism(
-              // Tell SysId how to plumb the driving voltage to the motors.
-              voltage -> {
-                m_frontLeftMotor.setVoltage(voltage);
-                m_frontRightMotor.setVoltage(voltage);
-                m_rearLeftMotor.setVoltage(voltage);
-                m_rearRightMotor.setVoltage(voltage);
-              },
-              // Tell SysId how to record a frame of data for each motor on the mechanism being
-              // characterized.
-              log -> {
-                log.motor("drive-left-front")
-                    .voltage(m_lastVoltage)
-                    .linearPosition(Meters.of(m_frontLeftMotor.getEncoderPosition()))
-                    .linearVelocity(MetersPerSecond.of(m_frontLeftMotor.getEncoderVelocity()));
-                log.motor("drive-left-rear")
-                    .voltage(m_lastVoltage)
-                    .linearPosition(Meters.of(m_rearLeftMotor.getEncoderPosition()))
-                    .linearVelocity(MetersPerSecond.of(m_rearLeftMotor.getEncoderVelocity()));
-                log.motor("drive-right-front")
-                    .voltage(m_lastVoltage)
-                    .linearPosition(Meters.of(m_frontRightMotor.getEncoderPosition()))
-                    .linearVelocity(MetersPerSecond.of(m_frontRightMotor.getEncoderVelocity()));
-                log.motor("drive-right-rear")
-                    .voltage(m_lastVoltage)
-                    .linearPosition(Meters.of(m_rearRightMotor.getEncoderPosition()))
-                    .linearVelocity(MetersPerSecond.of(m_rearRightMotor.getEncoderVelocity()));
-              },
-              // Tell SysId to make generated commands require this subsystem, suffix test state in
-              // WPILog with this subsystem's name ("drive")
-              this));
+  // private final SysIdRoutine m_sysIdRoutine =
+  //     new SysIdRoutine(
+  //         // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+  //         new SysIdRoutine.Config(),
+  //         new SysIdRoutine.Mechanism(
+  //             // Tell SysId how to plumb the driving voltage to the motors.
+  //             voltage -> {
+  //               m_frontLeftMotor.setVoltage(voltage);
+  //               m_frontRightMotor.setVoltage(voltage);
+  //               m_rearLeftMotor.setVoltage(voltage);
+  //               m_rearRightMotor.setVoltage(voltage);
+  //             },
+  //             // Tell SysId how to record a frame of data for each motor on the mechanism being
+  //             // characterized.
+  //             log -> {
+  //               log.motor("drive-left-front")
+  //                   .voltage(m_lastVoltage)
+  //                   .linearPosition(Meters.of(m_frontLeftMotor.getEncoderPosition()))
+  //                   .linearVelocity(MetersPerSecond.of(m_frontLeftMotor.getEncoderVelocity()));
+  //               log.motor("drive-left-rear")
+  //                   .voltage(m_lastVoltage)
+  //                   .linearPosition(Meters.of(m_rearLeftMotor.getEncoderPosition()))
+  //                   .linearVelocity(MetersPerSecond.of(m_rearLeftMotor.getEncoderVelocity()));
+  //               log.motor("drive-right-front")
+  //                   .voltage(m_lastVoltage)
+  //                   .linearPosition(Meters.of(m_frontRightMotor.getEncoderPosition()))
+  //                   .linearVelocity(MetersPerSecond.of(m_frontRightMotor.getEncoderVelocity()));
+  //               log.motor("drive-right-rear")
+  //                   .voltage(m_lastVoltage)
+  //                   .linearPosition(Meters.of(m_rearRightMotor.getEncoderPosition()))
+  //                   .linearVelocity(MetersPerSecond.of(m_rearRightMotor.getEncoderVelocity()));
+  //             },
+  //             // Tell SysId to make generated commands require this subsystem, suffix test state in
+  //             // WPILog with this subsystem's name ("drive")
+  //             this));
 
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
-  }
+  // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+  //   return m_sysIdRoutine.quasistatic(direction);
+  // }
 
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
-  }
+  // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+  //   return m_sysIdRoutine.dynamic(direction);
+  // }
 }

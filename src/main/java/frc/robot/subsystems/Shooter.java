@@ -1,26 +1,19 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.utils.ExpansionHubMotor;
-import frc.utils.ExpansionHubServo;
-
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import org.wpilib.commands3.Mechanism;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.ExpansionHubMotor;
+import edu.wpi.first.wpilibj.ExpansionHubServo;
 import frc.robot.Constants.ShooterConstants;
 
 @Logged
-public class Shooter extends SubsystemBase {
+public class Shooter extends Mechanism {
 
     @NotLogged
-    ExpansionHubMotor m_shooterMotor = new ExpansionHubMotor(1, ShooterConstants.kShooterMotorPort);
+    private ExpansionHubMotor m_shooterMotor = new ExpansionHubMotor(1, ShooterConstants.kShooterMotorPort);
 
     @NotLogged
     private ExpansionHubServo m_leftFeederServo = new ExpansionHubServo(1, 0);
@@ -63,19 +56,19 @@ public class Shooter extends SubsystemBase {
         return m_shooterMotor.isHubConnected();
     }
 
-    @NotLogged
-    private Voltage m_lastVoltage = Volts.of(0);
+    // @NotLogged
+    // private Voltage m_lastVoltage = Volts.of(0);
 
-    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(voltage -> {
-                m_shooterMotor.setVoltage(voltage);
-                m_lastVoltage = voltage;
-            }, log -> {
-                log.motor("shooter-wheel")
-                        .voltage(m_lastVoltage)
-                        .angularPosition(Rotations.of(getShooterPosition()))
-                        .angularVelocity(RotationsPerSecond.of(getShooterVelocity()));
-            }, this));
+    // private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+    //         new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(voltage -> {
+    //             m_shooterMotor.setVoltage(voltage);
+    //             m_lastVoltage = voltage;
+    //         }, log -> {
+    //             log.motor("shooter-wheel")
+    //                     .voltage(m_lastVoltage)
+    //                     .angularPosition(Rotations.of(getShooterPosition()))
+    //                     .angularVelocity(RotationsPerSecond.of(getShooterVelocity()));
+    //         }, this));
 
     private double m_lastSpeed = 0.0;
 
@@ -99,11 +92,11 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.quasistatic(direction);
-    }
+    // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    //     return m_sysIdRoutine.quasistatic(direction);
+    // }
 
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.dynamic(direction);
-    }
+    // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    //     return m_sysIdRoutine.dynamic(direction);
+    // }
 }
