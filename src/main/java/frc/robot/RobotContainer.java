@@ -96,7 +96,7 @@ public class RobotContainer {
     private void configureButtonBindings() {
         m_shooter.setDefaultCommand(m_shooter.runRepeatedly(() -> {
             m_shooter.setSpeed(m_driverController.getHID().getRightShoulderButton() ? 40 : 0);
-            m_shooter.setFeed(m_driverController.getHID().getLeftShoulderButton() ? true : false);
+            m_shooter.setFeed(m_driverController.getHID().getLeftShoulderButton() && m_driverController.getHID().getRightShoulderButton() ? true : false);
         }).withPriority(Command.LOWEST_PRIORITY).named("Default Shooter"));
 
         // m_driverController

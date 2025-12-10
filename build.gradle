@@ -31,6 +31,8 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                    jvmArgs << '--add-opens=java.base/jdk.internal.vm=ALL-UNNAMED'
+                    jvmArgs << '--add-opens=java.base/java.lang=ALL-UNNAMED'
                 }
 
                 // Static files artifact
