@@ -4,20 +4,20 @@
 
 package frc.robot;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystemNew;
 import frc.robot.subsystems.Shooter;
 
-import static edu.wpi.first.units.Units.Amps;
+import static org.wpilib.units.Units.Amps;
 
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.button.CommandGamepad;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.button.CommandGamepad;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
+import org.wpilib.hardware.discrete.AnalogInput;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.units.measure.Current;
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a

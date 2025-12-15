@@ -1,12 +1,12 @@
 package frc.robot.subsystems;
 
-import org.wpilib.commands3.Mechanism;
+import org.wpilib.command3.Mechanism;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.NotLogged;
+import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
+import org.wpilib.hardware.expansionhub.ExpansionHubServo;
+import org.wpilib.units.measure.Current;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.wpilibj.ExpansionHubMotor;
-import edu.wpi.first.wpilibj.ExpansionHubServo;
 import frc.robot.Constants.ShooterConstants;
 
 @Logged

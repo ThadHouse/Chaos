@@ -4,13 +4,13 @@
 
 package frc.robot;
 
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Scheduler;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Scheduler;
 
-import edu.wpi.first.epilogue.Epilogue;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.wpilib.epilogue.Epilogue;
+import org.wpilib.epilogue.Logged;
+import org.wpilib.framework.TimedRobot;
+import org.wpilib.system.DataLogManager;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

@@ -3,7 +3,7 @@ package frc.utils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.I2C;
+import org.wpilib.hardware.bus.I2C;
 
 public class OctoQuadV3 {
     private final I2C i2c;
