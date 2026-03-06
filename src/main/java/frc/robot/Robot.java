@@ -80,8 +80,8 @@ public class Robot extends OpModeRobot {
     DataLogManager.start("/home/systemcore/logs");
     DataLogManager.start();
 
-    PortForwarder.add(6100, "172.29.0.21", 5800);
-    PortForwarder.add(6101, "172.29.0.21", 5801);
+    PortForwarder.add(6100, "172.29.0.1", 5800);
+    PortForwarder.add(6101, "172.29.0.1", 5801);
   }
 
   public void robotPeriodic() {
