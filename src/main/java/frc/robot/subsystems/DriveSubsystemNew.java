@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
+import static org.wpilib.units.Units.Seconds;
+
+import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.command3.Scheduler;
+import org.wpilib.driverstation.Gamepad;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.hardware.bus.I2C.Port;
 import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
@@ -65,6 +69,12 @@ public class DriveSubsystemNew extends Mechanism {
     m_pinpoint.update();
 
     Scheduler.getDefault().addPeriodic(this::periodic);
+
+    var zeroSpeeds = new MecanumDriveWheelSpeeds();
+
+    this.setDefaultCommand(this.runRepeatedly(() -> {
+      this.setSpeeds(zeroSpeeds);
+    }).withPriority(Command.LOWEST_PRIORITY).named("Drive Default"));
   }
 
   public void periodic() {
@@ -175,50 +185,21 @@ public class DriveSubsystemNew extends Mechanism {
     return m_pinpoint.getHeading();
   }
 
-  // @NotLogged
-  // private Voltage m_lastVoltage = Volts.of(0);
+  public Command getJoystickDriveCommand(Gamepad gamepad) {
+    return this.runRepeatedly(() -> {
+      driveJoysticks(
+          -gamepad.getLeftX(),
+          -gamepad.getLeftY(),
+          -gamepad.getRightX(),
+          true);
+    }).withPriority(Command.DEFAULT_PRIORITY).named("Joystick Drive");
+  }
 
-  // private final SysIdRoutine m_sysIdRoutine =
-  //     new SysIdRoutine(
-  //         // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-  //         new SysIdRoutine.Config(),
-  //         new SysIdRoutine.Mechanism(
-  //             // Tell SysId how to plumb the driving voltage to the motors.
-  //             voltage -> {
-  //               m_frontLeftMotor.setVoltage(voltage);
-  //               m_frontRightMotor.setVoltage(voltage);
-  //               m_rearLeftMotor.setVoltage(voltage);
-  //               m_rearRightMotor.setVoltage(voltage);
-  //             },
-  //             // Tell SysId how to record a frame of data for each motor on the mechanism being
-  //             // characterized.
-  //             log -> {
-  //               log.motor("drive-left-front")
-  //                   .voltage(m_lastVoltage)
-  //                   .linearPosition(Meters.of(m_frontLeftMotor.getEncoderPosition()))
-  //                   .linearVelocity(MetersPerSecond.of(m_frontLeftMotor.getEncoderVelocity()));
-  //               log.motor("drive-left-rear")
-  //                   .voltage(m_lastVoltage)
-  //                   .linearPosition(Meters.of(m_rearLeftMotor.getEncoderPosition()))
-  //                   .linearVelocity(MetersPerSecond.of(m_rearLeftMotor.getEncoderVelocity()));
-  //               log.motor("drive-right-front")
-  //                   .voltage(m_lastVoltage)
-  //                   .linearPosition(Meters.of(m_frontRightMotor.getEncoderPosition()))
-  //                   .linearVelocity(MetersPerSecond.of(m_frontRightMotor.getEncoderVelocity()));
-  //               log.motor("drive-right-rear")
-  //                   .voltage(m_lastVoltage)
-  //                   .linearPosition(Meters.of(m_rearRightMotor.getEncoderPosition()))
-  //                   .linearVelocity(MetersPerSecond.of(m_rearRightMotor.getEncoderVelocity()));
-  //             },
-  //             // Tell SysId to make generated commands require this subsystem, suffix test state in
-  //             // WPILog with this subsystem's name ("drive")
-  //             this));
-
-  // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-  //   return m_sysIdRoutine.quasistatic(direction);
-  // }
-
-  // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-  //   return m_sysIdRoutine.dynamic(direction);
-  // }
+  public Command driveForwardTime(double time) {
+    return this.run(c -> {
+      driveJoysticks(0.0, 1.0, 0.0, true);
+      c.wait(Seconds.of(time));
+      driveJoysticks(0.0, 0.0, 0.0, true);
+    }).withPriority(Command.DEFAULT_PRIORITY).named("Drive Forward " + time);
+  }
 }

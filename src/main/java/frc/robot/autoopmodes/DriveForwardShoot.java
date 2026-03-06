@@ -1,21 +1,25 @@
-package frc.robot.testopmodes;
+package frc.robot.autoopmodes;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
+import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.opmode.TestOpMode;
 
 import frc.robot.Robot;
 
-@TestOpMode
-public class SpinShooter extends PeriodicOpMode {
+@Autonomous
+public class DriveForwardShoot extends PeriodicOpMode {
     private final Robot m_robot;
 
-    private final Command spinCommand;
+    private final Command m_command;
 
-    public SpinShooter(Robot robot) {
+    public DriveForwardShoot(Robot robot) {
         m_robot = robot;
-        spinCommand = m_robot.getShooter().getSpinCommand();
+
+        m_command = Command.sequence(
+            m_robot.getDrive().driveForwardTime(2),
+            m_robot.getShooter().shootTime(5)
+        ).named("DriveForwardShoot");
     }
 
     @Override
@@ -25,7 +29,7 @@ public class SpinShooter extends PeriodicOpMode {
 
     @Override
     public void start() {
-        Scheduler.getDefault().schedule(spinCommand);
+        Scheduler.getDefault().schedule(m_command);
     }
 
     @Override
@@ -35,7 +39,6 @@ public class SpinShooter extends PeriodicOpMode {
 
     @Override
     public void end() {
-        Scheduler.getDefault().cancel(spinCommand);
+        Scheduler.getDefault().cancel(m_command);
     }
-
 }

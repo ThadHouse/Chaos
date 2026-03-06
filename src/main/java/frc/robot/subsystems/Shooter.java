@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import static org.wpilib.units.Units.Seconds;
+
+import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
@@ -38,6 +41,11 @@ public class Shooter extends Mechanism {
         var pidConstants = m_shooterMotor.getVelocityPidConstants();
         pidConstants.setPID(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD);
         pidConstants.setFF(ShooterConstants.kS, ShooterConstants.kV, ShooterConstants.kA);
+
+        this.setDefaultCommand(this.runRepeatedly(() -> {
+            setSpeed(0);
+            setFeed(false);
+        }).withPriority(Command.LOWEST_PRIORITY).named("Default Shooter"));
     }
 
     public double getShooterVelocity() {
@@ -56,20 +64,7 @@ public class Shooter extends Mechanism {
         return m_shooterMotor.isHubConnected();
     }
 
-    // @NotLogged
-    // private Voltage m_lastVoltage = Volts.of(0);
-
-    // private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-    //         new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(voltage -> {
-    //             m_shooterMotor.setVoltage(voltage);
-    //             m_lastVoltage = voltage;
-    //         }, log -> {
-    //             log.motor("shooter-wheel")
-    //                     .voltage(m_lastVoltage)
-    //                     .angularPosition(Rotations.of(getShooterPosition()))
-    //                     .angularVelocity(RotationsPerSecond.of(getShooterVelocity()));
-    //         }, this));
-
+    @NotLogged
     private double m_lastSpeed = 0.0;
 
     public void setSpeed(double speed) {
@@ -92,11 +87,27 @@ public class Shooter extends Mechanism {
         }
     }
 
-    // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    //     return m_sysIdRoutine.quasistatic(direction);
-    // }
+    public Command getSpinCommand() {
+        return this.runRepeatedly(() -> {
+            setSpeed(40);
+            setFeed(false);
+        }).withPriority(Command.DEFAULT_PRIORITY).named("Spin Shooter");
+    }
 
-    // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    //     return m_sysIdRoutine.dynamic(direction);
-    // }
+    public Command getSpinAndFeedCommand() {
+        return this.runRepeatedly(() -> {
+            setSpeed(40);
+            setFeed(true);
+        }).withPriority(Command.DEFAULT_PRIORITY + 1).named("Spin and Feed Shooter");
+    }
+
+    public Command shootTime(double time) {
+        return this.run(c -> {
+            setSpeed(40);
+            setFeed(true);
+            c.wait(Seconds.of(time));
+            setSpeed(0);
+            setFeed(false);
+        }).withPriority(Command.DEFAULT_PRIORITY).named("Shoot " + time);
+    }
 }
