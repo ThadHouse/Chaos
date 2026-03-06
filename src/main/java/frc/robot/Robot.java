@@ -13,6 +13,7 @@ import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
 import org.wpilib.framework.OpModeRobot;
 import org.wpilib.hardware.discrete.AnalogInput;
+import org.wpilib.net.PortForwarder;
 import org.wpilib.system.DataLogManager;
 import org.wpilib.units.measure.Current;
 
@@ -78,6 +79,9 @@ public class Robot extends OpModeRobot {
   public Robot() {
     DataLogManager.start("/home/systemcore/logs");
     DataLogManager.start();
+
+    PortForwarder.add(6100, "172.29.0.21", 5800);
+    PortForwarder.add(6101, "172.29.0.21", 5801);
   }
 
   public void robotPeriodic() {
