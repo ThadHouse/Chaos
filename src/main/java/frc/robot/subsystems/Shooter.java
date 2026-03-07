@@ -4,6 +4,7 @@ import static org.wpilib.units.Units.Seconds;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
+import org.wpilib.command3.Scheduler;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
 import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
@@ -24,8 +25,12 @@ public class Shooter extends Mechanism {
     @NotLogged
     private ExpansionHubServo m_rightFeederServo = new ExpansionHubServo(1, 2);
 
+    @NotLogged
+    private final Leds m_leds;
+
     /** Creates a new Shooter. */
-    public Shooter() {
+    public Shooter(Leds leds) {
+        m_leds = leds;
         m_shooterMotor.setReversed(true);
         m_shooterMotor.setDistancePerCount(ShooterConstants.kEncoderDistancePerPulse);
         m_shooterMotor.setEnabled(true);
@@ -46,6 +51,21 @@ public class Shooter extends Mechanism {
             setSpeed(0);
             setFeed(false);
         }).withPriority(Command.LOWEST_PRIORITY).named("Default Shooter"));
+
+        Scheduler.getDefault().addPeriodic(this::periodic);
+    }
+
+    public void periodic() {
+        if (m_lastSpeed == 0) {
+            m_leds.setAllBlue();
+            return;
+        }
+        var error = getShooterVelocity() - m_lastSpeed;
+        if (Math.abs(error) > 2) {
+            m_leds.setAllRed();
+        } else {
+            m_leds.setAllGreen();
+        }
     }
 
     public double getShooterVelocity() {

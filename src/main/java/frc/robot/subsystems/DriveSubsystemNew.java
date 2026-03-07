@@ -188,8 +188,8 @@ public class DriveSubsystemNew extends Mechanism {
   public Command getJoystickDriveCommand(Gamepad gamepad) {
     return this.runRepeatedly(() -> {
       driveJoysticks(
-          -gamepad.getLeftX(),
           -gamepad.getLeftY(),
+          -gamepad.getLeftX(),
           -gamepad.getRightX(),
           true);
     }).withPriority(Command.DEFAULT_PRIORITY).named("Joystick Drive");

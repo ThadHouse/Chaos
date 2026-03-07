@@ -18,6 +18,7 @@ import org.wpilib.units.measure.Current;
 
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystemNew;
+import frc.robot.subsystems.Leds;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -38,7 +39,10 @@ public class Robot extends OpModeRobot {
   private final DriveSubsystemNew m_robotDrive = new DriveSubsystemNew();
 
   @NotLogged
-  private final Shooter m_shooter = new Shooter();
+  private final Shooter m_shooter;
+
+  @NotLogged
+  private final Leds m_leds = new Leds();
 
   @Logged
   public DriveSubsystemNew getDrive() {
@@ -48,6 +52,11 @@ public class Robot extends OpModeRobot {
   @Logged
   public Shooter getShooter() {
     return m_shooter;
+  }
+
+  @NotLogged
+  public Leds getLeds() {
+    return m_leds;
   }
 
   @NotLogged
@@ -76,6 +85,7 @@ public class Robot extends OpModeRobot {
    * initialization code.
    */
   public Robot() {
+    m_shooter = new Shooter(m_leds);
     DataLogManager.start("/home/systemcore/logs");
     DataLogManager.start();
   }
