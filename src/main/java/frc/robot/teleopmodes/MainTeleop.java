@@ -32,7 +32,7 @@ public class MainTeleop extends PeriodicOpMode {
         var driverGamepad = m_robot.getDriverGamepad();
 
         driverGamepad.rightBumper().and(driverGamepad.leftBumper()).whileTrue(shooter.getSpinAndFeedCommand());
-        driverGamepad.rightBumper().whileTrue(shooter.getSpinCommand());
+        driverGamepad.rightBumper().and(driverGamepad.leftBumper().negate()).whileTrue(shooter.getSpinCommand());
     }
 
     @Override
