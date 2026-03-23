@@ -1,0 +1,11 @@
+[tool.robotpy]
+# The version of robotpy to install/use. Version numbers are aligned with WPILib.
+robotpy_version = "2027.0.0b1"
+
+# A list of robotpy components to install
+robotpy_extras = [
+    "commands3",
+]
+
+# Additional requirements beyond robotpy itself
+requires = []

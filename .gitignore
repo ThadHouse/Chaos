@@ -182,3 +182,23 @@ ctre_sim/
 # clangd
 /.cache
 compile_commands.json
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+*.egg-info/
+dist/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# robotpy sync cache
+.robotpy_cache/
