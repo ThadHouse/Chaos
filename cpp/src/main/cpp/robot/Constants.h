@@ -7,7 +7,7 @@
 #include <numbers>
 
 #include <frc/geometry/Translation2d.h>
-#include <frc/hardware/bus/I2C.h>
+#include <frc/I2C.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
@@ -74,8 +74,7 @@ inline constexpr double kDriveDeadband = 0.05;
 namespace ShooterConstants {
 inline constexpr int kShooterMotorPort = 0;
 inline constexpr int kEncoderPort = 0;
-inline constexpr frc::hardware::bus::I2C::Port kI2cPort =
-    frc::hardware::bus::I2C::Port::kPort0;
+inline constexpr frc::I2C::Port kI2cPort = frc::I2C::Port::kOnboard;
 
 inline constexpr double kP = 0.16666;
 inline constexpr double kI = 0.0;

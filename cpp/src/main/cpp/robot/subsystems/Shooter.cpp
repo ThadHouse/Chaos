@@ -7,8 +7,7 @@
 #include <cmath>
 #include <string>
 
-#include <frc/commands3/Command.h>
-#include <frc/commands3/Scheduler.h>
+#include <frc2/command/CommandScheduler.h>
 #include <units/time.h>
 
 #include "../Constants.h"
@@ -20,29 +19,16 @@ Shooter::Shooter(Leds& leds) : m_leds{leds} {
   m_shooterMotor.SetDistancePerCount(ShooterConstants::kEncoderDistancePerPulse);
   m_shooterMotor.SetEnabled(true);
 
-  m_leftFeederServo.SetContinuousRotationMode(true);
-  m_rightFeederServo.SetContinuousRotationMode(true);
-
-  m_leftFeederServo.SetReversed(true);
-
-  m_leftFeederServo.SetEnabled(true);
-  m_rightFeederServo.SetEnabled(true);
-
-  auto pidConstants = m_shooterMotor.GetVelocityPidConstants();
+  auto& pidConstants = m_shooterMotor.GetVelocityPidConstants();
   pidConstants.SetPID(ShooterConstants::kP, ShooterConstants::kI,
                       ShooterConstants::kD);
   pidConstants.SetFF(ShooterConstants::kS, ShooterConstants::kV,
                      ShooterConstants::kA);
 
-  SetDefaultCommand(RunRepeatedly([this] {
-                      SetSpeed(0);
-                      SetFeed(false);
-                    })
-                        .WithPriority(frc::commands3::Command::kLowestPriority)
-                        .Named("Default Shooter"));
-
-  frc::commands3::Scheduler::GetDefault().AddPeriodic(
-      [this] { Periodic(); });
+  SetDefaultCommand(Run([this] {
+    SetSpeed(0);
+    SetFeed(false);
+  }).WithName("Default Shooter"));
 }
 
 void Shooter::Periodic() {
@@ -94,32 +80,30 @@ void Shooter::SetFeed(bool feed) {
   }
 }
 
-frc::commands3::Command Shooter::GetSpinCommand() {
-  return RunRepeatedly([this] {
+frc2::CommandPtr Shooter::GetSpinCommand() {
+  return Run([this] {
            SetSpeed(40);
            SetFeed(false);
-         })
-      .WithPriority(frc::commands3::Command::kDefaultPriority)
-      .Named("Spin Shooter");
+         }).WithName("Spin Shooter");
 }
 
-frc::commands3::Command Shooter::GetSpinAndFeedCommand() {
-  return RunRepeatedly([this] {
+frc2::CommandPtr Shooter::GetSpinAndFeedCommand() {
+  return Run([this] {
            SetSpeed(40);
            SetFeed(true);
-         })
-      .WithPriority(frc::commands3::Command::kDefaultPriority + 1)
-      .Named("Spin and Feed Shooter");
+         }).WithName("Spin and Feed Shooter");
 }
 
-frc::commands3::Command Shooter::ShootTime(double time) {
-  return Run([this, time](auto& c) {
-           SetSpeed(40);
-           SetFeed(true);
-           c.Wait(units::second_t{time});
-           SetSpeed(0);
-           SetFeed(false);
-         })
-      .WithPriority(frc::commands3::Command::kDefaultPriority)
-      .Named("Shoot " + std::to_string(time));
+frc2::CommandPtr Shooter::ShootTime(double time) {
+  return RunEnd(
+             [this] {
+               SetSpeed(40);
+               SetFeed(true);
+             },
+             [this] {
+               SetSpeed(0);
+               SetFeed(false);
+             })
+      .WithTimeout(units::second_t{time})
+      .WithName("Shoot " + std::to_string(time));
 }

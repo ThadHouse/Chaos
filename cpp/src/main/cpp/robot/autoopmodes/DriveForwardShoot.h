@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include <frc/commands3/Command.h>
-#include <frc/opmode/PeriodicOpMode.h>
+#include <frc2/command/CommandPtr.h>
 
 #include "../Robot.h"
 
@@ -14,23 +13,23 @@ namespace robot {
 namespace autoopmodes {
 
 /**
- * Autonomous OpMode: drive forward for 2 seconds, then shoot for 5 seconds.
+ * Autonomous mode: drive forward for 2 seconds, then shoot for 5 seconds.
  *
- * Registered with the @Autonomous annotation equivalent:
- *   REGISTER_AUTONOMOUS(DriveForwardShoot)
+ * In the C++ port, this logic is scheduled from Robot::AutonomousInit().
+ * This class exists as a logical grouping matching the Java @Autonomous opmode.
  */
-class DriveForwardShoot : public frc::opmode::PeriodicOpMode {
+class DriveForwardShoot {
  public:
   explicit DriveForwardShoot(Robot& robot);
 
-  void DisabledPeriodic() override;
-  void Start() override;
-  void Periodic() override;
-  void End() override;
+  void DisabledPeriodic();
+  void Start();
+  void Periodic();
+  void End();
 
  private:
   Robot& m_robot;
-  frc::commands3::Command m_command;
+  frc2::CommandPtr m_command;
 };
 
 }  // namespace autoopmodes

@@ -6,10 +6,8 @@
 
 #include <string>
 
-#include <frc/commands3/Command.h>
-#include <frc/commands3/Scheduler.h>
+#include <frc/Timer.h>
 #include <frc/kinematics/ChassisSpeeds.h>
-#include <frc/system/Timer.h>
 #include <units/time.h>
 
 #include "../Constants.h"
@@ -20,11 +18,10 @@ using namespace frc::robot::subsystems;
 // Private helper
 // ---------------------------------------------------------------------------
 
-void DriveSubsystemNew::SetPids(
-    frc::hardware::expansionhub::ExpansionHubMotor& motor) {
+void DriveSubsystemNew::SetPids(frc::robot::hardware::ExpansionHubMotor& motor) {
   motor.SetDistancePerCount(DriveConstants::kEncoderDistancePerPulse);
 
-  auto pidConstants = motor.GetVelocityPidConstants();
+  auto& pidConstants = motor.GetVelocityPidConstants();
   pidConstants.SetPID(DriveConstants::kP, 0.0, 0.0);
   pidConstants.SetFF(DriveConstants::kS, DriveConstants::kV,
                      DriveConstants::kA);
@@ -55,17 +52,13 @@ DriveSubsystemNew::DriveSubsystemNew() {
   SetPids(m_rearLeftMotor);
   SetPids(m_rearRightMotor);
 
-  frc::Timer::Delay(0.5_s);
+  frc::Wait(0.5_s);
 
   m_pinpoint.Update();
 
-  frc::commands3::Scheduler::GetDefault().AddPeriodic(
-      [this] { Periodic(); });
-
   frc::MecanumDriveWheelSpeeds zeroSpeeds{};
-  SetDefaultCommand(RunRepeatedly([this, zeroSpeeds] { SetSpeeds(zeroSpeeds); })
-                        .WithPriority(frc::commands3::Command::kLowestPriority)
-                        .Named("Drive Default"));
+  SetDefaultCommand(
+      Run([this, zeroSpeeds] { SetSpeeds(zeroSpeeds); }).WithName("Drive Default"));
 }
 
 // ---------------------------------------------------------------------------
@@ -160,22 +153,18 @@ frc::Rotation2d DriveSubsystemNew::GetHeading() {
   return m_pinpoint.GetHeading();
 }
 
-frc::commands3::Command DriveSubsystemNew::GetJoystickDriveCommand(
-    frc::driverstation::Gamepad& gamepad) {
-  return RunRepeatedly([this, &gamepad] {
-           DriveJoysticks(-gamepad.GetLeftY(), -gamepad.GetLeftX(),
-                          -gamepad.GetRightX(), true);
-         })
-      .WithPriority(frc::commands3::Command::kDefaultPriority)
-      .Named("Joystick Drive");
+frc2::CommandPtr DriveSubsystemNew::GetJoystickDriveCommand(
+    frc::GenericHID& gamepad) {
+  return Run([this, &gamepad] {
+           DriveJoysticks(-gamepad.GetRawAxis(1), -gamepad.GetRawAxis(0),
+                          -gamepad.GetRawAxis(4), true);
+         }).WithName("Joystick Drive");
 }
 
-frc::commands3::Command DriveSubsystemNew::DriveForwardTime(double time) {
-  return Run([this, time](auto& c) {
-           DriveJoysticks(0.0, 1.0, 0.0, true);
-           c.Wait(units::second_t{time});
-           DriveJoysticks(0.0, 0.0, 0.0, true);
-         })
-      .WithPriority(frc::commands3::Command::kDefaultPriority)
-      .Named("Drive Forward " + std::to_string(time));
+frc2::CommandPtr DriveSubsystemNew::DriveForwardTime(double time) {
+  return RunEnd(
+             [this] { DriveJoysticks(0.0, 1.0, 0.0, true); },
+             [this] { DriveJoysticks(0.0, 0.0, 0.0, true); })
+      .WithTimeout(units::second_t{time})
+      .WithName("Drive Forward " + std::to_string(time));
 }

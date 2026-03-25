@@ -4,19 +4,19 @@
 
 #pragma once
 
-#include <frc/commands3/Command.h>
-#include <frc/commands3/Mechanism.h>
-#include <frc/driverstation/Gamepad.h>
+#include <frc/GenericHID.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
-#include <frc/hardware/expansionhub/ExpansionHubMotor.h>
 #include <frc/kinematics/MecanumDriveWheelPositions.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/SubsystemBase.h>
 #include <units/angular_velocity.h>
 #include <units/current.h>
 #include <units/velocity.h>
 
 #include "../Constants.h"
+#include "../hardware/ExpansionHubMotor.h"
 #include "GoBildaPinpoint.h"
 
 namespace frc {
@@ -29,12 +29,12 @@ namespace subsystems {
  * Controls four ExpansionHub motors (hub 0) in a mecanum configuration,
  * using the GoBilda Pinpoint I2C odometry computer for global pose tracking.
  */
-class DriveSubsystemNew : public frc::commands3::Mechanism {
+class DriveSubsystemNew : public frc2::SubsystemBase {
  public:
   DriveSubsystemNew();
 
   /** Called periodically to update odometry. */
-  void Periodic();
+  void Periodic() override;
 
   /** @return Current draw of the front-left motor. */
   units::ampere_t GetFrontLeftCurrent();
@@ -108,30 +108,28 @@ class DriveSubsystemNew : public frc::commands3::Mechanism {
    *
    * @param gamepad Gamepad to read joystick values from.
    */
-  frc::commands3::Command GetJoystickDriveCommand(
-      frc::driverstation::Gamepad& gamepad);
+  frc2::CommandPtr GetJoystickDriveCommand(frc::GenericHID& gamepad);
 
   /**
    * @return Command that drives forward at full speed for the given duration.
    *
    * @param time Duration in seconds.
    */
-  frc::commands3::Command DriveForwardTime(double time);
+  frc2::CommandPtr DriveForwardTime(double time);
 
  private:
-  frc::hardware::expansionhub::ExpansionHubMotor m_frontLeftMotor{
+  frc::robot::hardware::ExpansionHubMotor m_frontLeftMotor{
       0, DriveConstants::kFrontLeftMotorPort};
-  frc::hardware::expansionhub::ExpansionHubMotor m_frontRightMotor{
+  frc::robot::hardware::ExpansionHubMotor m_frontRightMotor{
       0, DriveConstants::kFrontRightMotorPort};
-  frc::hardware::expansionhub::ExpansionHubMotor m_rearLeftMotor{
+  frc::robot::hardware::ExpansionHubMotor m_rearLeftMotor{
       0, DriveConstants::kRearLeftMotorPort};
-  frc::hardware::expansionhub::ExpansionHubMotor m_rearRightMotor{
+  frc::robot::hardware::ExpansionHubMotor m_rearRightMotor{
       0, DriveConstants::kRearRightMotorPort};
 
-  GoBildaPinpoint m_pinpoint{
-      frc::hardware::bus::I2C::Port::kPort1};
+  GoBildaPinpoint m_pinpoint{frc::I2C::Port::kMXP};
 
-  static void SetPids(frc::hardware::expansionhub::ExpansionHubMotor& motor);
+  static void SetPids(frc::robot::hardware::ExpansionHubMotor& motor);
 };
 
 }  // namespace subsystems

@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include <frc/commands3/Command.h>
-#include <frc/opmode/PeriodicOpMode.h>
+#include <frc2/command/CommandPtr.h>
 
 #include "../Robot.h"
 
@@ -14,23 +13,23 @@ namespace robot {
 namespace testopmodes {
 
 /**
- * Test OpMode: continuously spins the shooter at 40 rot/s.
+ * Test mode: continuously spins the shooter at 40 rot/s.
  *
- * Registered with the @TestOpMode annotation equivalent:
- *   REGISTER_TEST_OP_MODE(SpinShooter)
+ * In the C++ port, this logic is scheduled from Robot::TestInit().
+ * This class exists as a logical grouping matching the Java @TestOpMode opmode.
  */
-class SpinShooter : public frc::opmode::PeriodicOpMode {
+class SpinShooter {
  public:
   explicit SpinShooter(Robot& robot);
 
-  void DisabledPeriodic() override;
-  void Start() override;
-  void Periodic() override;
-  void End() override;
+  void DisabledPeriodic();
+  void Start();
+  void Periodic();
+  void End();
 
  private:
   Robot& m_robot;
-  frc::commands3::Command m_spinCommand;
+  frc2::CommandPtr m_spinCommand;
 };
 
 }  // namespace testopmodes

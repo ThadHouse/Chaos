@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include <frc/hardware/bus/I2C.h>
+#include <frc/I2C.h>
 
 namespace frc {
 namespace utils {
@@ -25,7 +25,7 @@ class OctoQuadV3 {
     int16_t velocities[8] = {};
   };
 
-  explicit OctoQuadV3(frc::hardware::bus::I2C::Port port);
+  explicit OctoQuadV3(frc::I2C::Port port);
 
   /**
    * Reads all encoder positions and velocities from the device.
@@ -55,7 +55,7 @@ class OctoQuadV3 {
   uint8_t GetChipId();
 
  private:
-  frc::hardware::bus::I2C m_i2c;
+  frc::I2C m_i2c;
   int m_encoderDirections = 0;
 
   /**

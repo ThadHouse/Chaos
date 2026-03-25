@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc/commands3/Command.h>
-#include <frc/commands3/Mechanism.h>
-#include <frc/hardware/expansionhub/ExpansionHubMotor.h>
-#include <frc/hardware/expansionhub/ExpansionHubServo.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/SubsystemBase.h>
 #include <units/current.h>
 
 #include "../Constants.h"
+#include "../hardware/ExpansionHubMotor.h"
+#include "../hardware/ExpansionHubServo.h"
 #include "Leds.h"
 
 namespace frc {
@@ -27,12 +27,12 @@ namespace subsystems {
  *   - Red:   Error > 2 rot/s
  *   - Green: Error ≤ 2 rot/s (at speed)
  */
-class Shooter : public frc::commands3::Mechanism {
+class Shooter : public frc2::SubsystemBase {
  public:
   explicit Shooter(Leds& leds);
 
   /** Periodic update: update LEDs based on velocity error. */
-  void Periodic();
+  void Periodic() override;
 
   /** @return Current shooter wheel velocity in rotations per second. */
   double GetShooterVelocity();
@@ -62,23 +62,23 @@ class Shooter : public frc::commands3::Mechanism {
   void SetFeed(bool feed);
 
   /** @return Command that spins shooter at 40 rot/s without feeding. */
-  frc::commands3::Command GetSpinCommand();
+  frc2::CommandPtr GetSpinCommand();
 
   /** @return Command that spins shooter at 40 rot/s and enables feeding. */
-  frc::commands3::Command GetSpinAndFeedCommand();
+  frc2::CommandPtr GetSpinAndFeedCommand();
 
   /**
    * @return Command that shoots for the given duration then stops.
    *
    * @param time Duration in seconds.
    */
-  frc::commands3::Command ShootTime(double time);
+  frc2::CommandPtr ShootTime(double time);
 
  private:
-  frc::hardware::expansionhub::ExpansionHubMotor m_shooterMotor{
+  frc::robot::hardware::ExpansionHubMotor m_shooterMotor{
       1, ShooterConstants::kShooterMotorPort};
-  frc::hardware::expansionhub::ExpansionHubServo m_leftFeederServo{1, 0};
-  frc::hardware::expansionhub::ExpansionHubServo m_rightFeederServo{1, 2};
+  frc::robot::hardware::ExpansionHubServo m_leftFeederServo{1, 0};
+  frc::robot::hardware::ExpansionHubServo m_rightFeederServo{1, 2};
 
   Leds& m_leds;
   double m_lastSpeed = 0.0;

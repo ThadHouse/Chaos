@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <frc/hardware/led/AddressableLED.h>
-#include <frc/hardware/led/AddressableLEDBuffer.h>
+#include <vector>
+
+#include <frc/AddressableLED.h>
 
 namespace frc {
 namespace robot {
@@ -34,10 +35,10 @@ class Leds {
   static constexpr int kLedPort = 3;
   static constexpr int kLedCount = 30;
 
-  frc::hardware::led::AddressableLED m_led{kLedPort};
-  frc::hardware::led::AddressableLEDBuffer m_allRed{kLedCount};
-  frc::hardware::led::AddressableLEDBuffer m_allGreen{kLedCount};
-  frc::hardware::led::AddressableLEDBuffer m_allBlue{kLedCount};
+  frc::AddressableLED m_led{kLedPort};
+  std::vector<frc::AddressableLED::LEDData> m_allRed;
+  std::vector<frc::AddressableLED::LEDData> m_allGreen;
+  std::vector<frc::AddressableLED::LEDData> m_allBlue;
 };
 
 }  // namespace subsystems

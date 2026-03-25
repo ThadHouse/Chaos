@@ -14,7 +14,7 @@ using namespace frc::robot::subsystems;
 // Constructor
 // ---------------------------------------------------------------------------
 
-GoBildaPinpoint::GoBildaPinpoint(frc::hardware::bus::I2C::Port port)
+GoBildaPinpoint::GoBildaPinpoint(frc::I2C::Port port)
     : m_i2c{port, kDefaultAddress} {}
 
 // ---------------------------------------------------------------------------

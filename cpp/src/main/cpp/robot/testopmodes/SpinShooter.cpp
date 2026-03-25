@@ -4,10 +4,7 @@
 
 #include "SpinShooter.h"
 
-#include <frc/commands3/Scheduler.h>
-
-// Registration macro — equivalent to Java @TestOpMode annotation
-REGISTER_TEST_OP_MODE(frc::robot::testopmodes::SpinShooter)
+#include <frc2/command/CommandScheduler.h>
 
 using namespace frc::robot::testopmodes;
 
@@ -20,7 +17,7 @@ void SpinShooter::DisabledPeriodic() {
 }
 
 void SpinShooter::Start() {
-  frc::commands3::Scheduler::GetDefault().Schedule(m_spinCommand);
+  m_spinCommand.Schedule();
 }
 
 void SpinShooter::Periodic() {
@@ -28,5 +25,5 @@ void SpinShooter::Periodic() {
 }
 
 void SpinShooter::End() {
-  frc::commands3::Scheduler::GetDefault().Cancel(m_spinCommand);
+  m_spinCommand.Cancel();
 }

@@ -4,9 +4,6 @@
 
 #include "DoNothingAuto.h"
 
-// Registration macro — equivalent to Java @Autonomous annotation
-REGISTER_AUTONOMOUS(frc::robot::autoopmodes::DoNothingAuto)
-
 using namespace frc::robot::autoopmodes;
 
 DoNothingAuto::DoNothingAuto(Robot& robot) : m_robot{robot} {}

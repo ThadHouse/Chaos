@@ -4,35 +4,31 @@
 
 #include "MainTeleop.h"
 
-#include <frc/commands3/Scheduler.h>
-
-// Registration macro — equivalent to Java @Teleop annotation
-REGISTER_TELEOP(frc::robot::teleopmodes::MainTeleop)
+#include <frc2/command/CommandScheduler.h>
+#include <frc2/command/button/Trigger.h>
 
 using namespace frc::robot::teleopmodes;
 
 MainTeleop::MainTeleop(Robot& robot)
     : m_robot{robot},
-      m_joystickDriveCommand{m_robot.GetDrive().GetJoystickDriveCommand(
-          m_robot.GetDriverGamepad().GetHID())} {}
+      m_joystickDriveCommand{
+          m_robot.GetDrive().GetJoystickDriveCommand(m_robot.GetDriverGamepad())} {}
 
 void MainTeleop::DisabledPeriodic() {
   m_robot.RobotPeriodic();
 }
 
 void MainTeleop::Start() {
-  frc::commands3::Scheduler::GetDefault().Schedule(m_joystickDriveCommand);
+  m_joystickDriveCommand.Schedule();
 
   auto& shooter = m_robot.GetShooter();
-  auto& driverGamepad = m_robot.GetDriverGamepad();
+  auto& gamepad = m_robot.GetDriverGamepad();
 
-  driverGamepad.RightBumper()
-      .And(driverGamepad.LeftBumper())
-      .WhileTrue(shooter.GetSpinAndFeedCommand());
+  frc2::Trigger rightBumper{[&gamepad] { return gamepad.GetRawButton(6); }};
+  frc2::Trigger leftBumper{[&gamepad] { return gamepad.GetRawButton(5); }};
 
-  driverGamepad.RightBumper()
-      .And(driverGamepad.LeftBumper().Negate())
-      .WhileTrue(shooter.GetSpinCommand());
+  rightBumper.And(leftBumper).WhileTrue(shooter.GetSpinAndFeedCommand());
+  rightBumper.And(leftBumper.Negate()).WhileTrue(shooter.GetSpinCommand());
 }
 
 void MainTeleop::Periodic() {
@@ -40,5 +36,5 @@ void MainTeleop::Periodic() {
 }
 
 void MainTeleop::End() {
-  frc::commands3::Scheduler::GetDefault().Cancel(m_joystickDriveCommand);
+  m_joystickDriveCommand.Cancel();
 }

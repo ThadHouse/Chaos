@@ -4,27 +4,24 @@
 
 #include "DriveForwardShoot.h"
 
-#include <frc/commands3/Command.h>
-#include <frc/commands3/Scheduler.h>
-
-// Registration macro — equivalent to Java @Autonomous annotation
-REGISTER_AUTONOMOUS(frc::robot::autoopmodes::DriveForwardShoot)
+#include <frc2/command/CommandScheduler.h>
+#include <frc2/command/Commands.h>
 
 using namespace frc::robot::autoopmodes;
 
 DriveForwardShoot::DriveForwardShoot(Robot& robot)
     : m_robot{robot},
-      m_command{frc::commands3::Command::Sequence(
-                    m_robot.GetDrive().DriveForwardTime(2),
-                    m_robot.GetShooter().ShootTime(5))
-                    .Named("DriveForwardShoot")} {}
+      m_command{m_robot.GetDrive()
+                    .DriveForwardTime(2)
+                    .AndThen(m_robot.GetShooter().ShootTime(5))
+                    .WithName("DriveForwardShoot")} {}
 
 void DriveForwardShoot::DisabledPeriodic() {
   m_robot.RobotPeriodic();
 }
 
 void DriveForwardShoot::Start() {
-  frc::commands3::Scheduler::GetDefault().Schedule(m_command);
+  m_command.Schedule();
 }
 
 void DriveForwardShoot::Periodic() {
@@ -32,5 +29,5 @@ void DriveForwardShoot::Periodic() {
 }
 
 void DriveForwardShoot::End() {
-  frc::commands3::Scheduler::GetDefault().Cancel(m_command);
+  m_command.Cancel();
 }

@@ -10,7 +10,7 @@
  * the Robot class template parameter passed to RobotBase::StartRobot.
  */
 
-#include <frc/framework/RobotBase.h>
+#include <frc/RobotBase.h>
 
 #include "robot/Robot.h"
 

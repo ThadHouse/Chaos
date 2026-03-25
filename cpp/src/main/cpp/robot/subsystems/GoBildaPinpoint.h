@@ -9,7 +9,7 @@
 
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
-#include <frc/hardware/bus/I2C.h>
+#include <frc/I2C.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>
@@ -76,7 +76,7 @@ class GoBildaPinpoint {
   /** Narrow-scope read options */
   enum class ReadData { ONLY_UPDATE_HEADING };
 
-  explicit GoBildaPinpoint(frc::hardware::bus::I2C::Port port);
+  explicit GoBildaPinpoint(frc::I2C::Port port);
 
   /**
    * Call once per loop to read new data from the Odometry Computer.
@@ -199,7 +199,7 @@ class GoBildaPinpoint {
   frc::Pose2d GetPosition();
 
  private:
-  frc::hardware::bus::I2C m_i2c;
+  frc::I2C m_i2c;
 
   int32_t m_deviceStatus = 0;
   int32_t m_loopTime = 0;

@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include <frc/commands3/button/CommandGamepad.h>
-#include <frc/framework/OpModeRobot.h>
-#include <frc/hardware/discrete/AnalogInput.h>
+#include <frc/AnalogInput.h>
+#include <frc/GenericHID.h>
+#include <frc/TimedRobot.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/Commands.h>
 #include <units/current.h>
 
 #include "Constants.h"
@@ -23,12 +25,26 @@ namespace robot {
  * Owns the three subsystems (drive, shooter, LEDs) and driver gamepad.
  * Manages periodic telemetry logging and system-wide initialization.
  */
-class Robot : public frc::OpModeRobot {
+class Robot : public frc::TimedRobot {
  public:
   Robot();
 
-  /** Called every robot loop iteration. Runs the scheduler and logs data. */
-  void RobotPeriodic();
+  void RobotInit() override;
+
+  /** Called every robot loop iteration regardless of mode. */
+  void RobotPeriodic() override;
+
+  void AutonomousInit() override;
+  void AutonomousPeriodic() override;
+
+  void TeleopInit() override;
+  void TeleopPeriodic() override;
+
+  void DisabledInit() override;
+  void DisabledPeriodic() override;
+
+  void TestInit() override;
+  void TestPeriodic() override;
 
   /** @return Reference to the drive subsystem. */
   subsystems::DriveSubsystemNew& GetDrive() { return m_robotDrive; }
@@ -40,24 +56,23 @@ class Robot : public frc::OpModeRobot {
   subsystems::Leds& GetLeds() { return m_leds; }
 
   /** @return Reference to the driver gamepad. */
-  frc::commands3::button::CommandGamepad& GetDriverGamepad() {
-    return m_driverController;
-  }
+  frc::GenericHID& GetDriverGamepad() { return m_driverController; }
 
   /** @return Estimated robot current draw in amps. */
   units::ampere_t GetRobotCurrent();
-
-  void NonePeriodic() override;
 
  private:
   subsystems::Leds m_leds;
   subsystems::Shooter m_shooter{m_leds};
   subsystems::DriveSubsystemNew m_robotDrive;
 
-  frc::hardware::discrete::AnalogInput m_currentReading{5};
+  frc::AnalogInput m_currentReading{5};
 
-  frc::commands3::button::CommandGamepad m_driverController{
-      OIConstants::kDriverControllerPort};
+  frc::GenericHID m_driverController{OIConstants::kDriverControllerPort};
+
+  frc2::CommandPtr m_autonomousCommand{frc2::cmd::None()};
+  frc2::CommandPtr m_teleopCommand{frc2::cmd::None()};
+  frc2::CommandPtr m_testCommand{frc2::cmd::None()};
 };
 
 }  // namespace robot

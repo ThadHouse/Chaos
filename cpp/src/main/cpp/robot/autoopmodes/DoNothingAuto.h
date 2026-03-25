@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <frc/opmode/PeriodicOpMode.h>
-
 #include "../Robot.h"
 
 namespace frc {
@@ -13,17 +11,18 @@ namespace robot {
 namespace autoopmodes {
 
 /**
- * Autonomous OpMode that does nothing except run the robot periodic loop.
+ * Autonomous mode that does nothing except run the robot periodic loop.
  *
- * Registered with the @Autonomous annotation equivalent:
- *   REGISTER_AUTONOMOUS(DoNothingAuto)
+ * In the C++ port the robot framework is frc::TimedRobot, so mode selection
+ * is handled by Robot::AutonomousInit / AutonomousPeriodic. This class exists
+ * as a logical grouping for the "do nothing" auto logic.
  */
-class DoNothingAuto : public frc::opmode::PeriodicOpMode {
+class DoNothingAuto {
  public:
   explicit DoNothingAuto(Robot& robot);
 
-  void DisabledPeriodic() override;
-  void Periodic() override;
+  void DisabledPeriodic();
+  void Periodic();
 
  private:
   Robot& m_robot;
