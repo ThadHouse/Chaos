@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
-#include <frc2/command/SubsystemBase.h>
-#include <units/current.h>
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/commands2/SubsystemBase.hpp>
+#include <wpi/units/current.hpp>
 
 #include "../Constants.h"
-#include "../hardware/ExpansionHubMotor.h"
-#include "../hardware/ExpansionHubServo.h"
+#include <wpi/hardware/expansionhub/ExpansionHubMotor.hpp>
+#include <wpi/hardware/expansionhub/ExpansionHubServo.hpp>
 #include "Leds.h"
 
-namespace frc {
+namespace wpi {
 namespace robot {
 namespace subsystems {
 
@@ -27,7 +27,7 @@ namespace subsystems {
  *   - Red:   Error > 2 rot/s
  *   - Green: Error ≤ 2 rot/s (at speed)
  */
-class Shooter : public frc2::SubsystemBase {
+class Shooter : public wpi::cmd::SubsystemBase {
  public:
   explicit Shooter(Leds& leds);
 
@@ -41,7 +41,7 @@ class Shooter : public frc2::SubsystemBase {
   double GetShooterPosition();
 
   /** @return Current draw of the shooter motor. */
-  units::ampere_t GetShooterCurrent();
+  wpi::units::ampere_t GetShooterCurrent();
 
   /** @return Whether the expansion hub is connected. */
   bool IsHubConnected();
@@ -62,23 +62,23 @@ class Shooter : public frc2::SubsystemBase {
   void SetFeed(bool feed);
 
   /** @return Command that spins shooter at 40 rot/s without feeding. */
-  frc2::CommandPtr GetSpinCommand();
+  wpi::cmd::CommandPtr GetSpinCommand();
 
   /** @return Command that spins shooter at 40 rot/s and enables feeding. */
-  frc2::CommandPtr GetSpinAndFeedCommand();
+  wpi::cmd::CommandPtr GetSpinAndFeedCommand();
 
   /**
    * @return Command that shoots for the given duration then stops.
    *
    * @param time Duration in seconds.
    */
-  frc2::CommandPtr ShootTime(double time);
+  wpi::cmd::CommandPtr ShootTime(double time);
 
  private:
-  frc::robot::hardware::ExpansionHubMotor m_shooterMotor{
+  wpi::ExpansionHubMotor m_shooterMotor{
       1, ShooterConstants::kShooterMotorPort};
-  frc::robot::hardware::ExpansionHubServo m_leftFeederServo{1, 0};
-  frc::robot::hardware::ExpansionHubServo m_rightFeederServo{1, 2};
+  wpi::ExpansionHubServo m_leftFeederServo{1, 0};
+  wpi::ExpansionHubServo m_rightFeederServo{1, 2};
 
   Leds& m_leds;
   double m_lastSpeed = 0.0;
@@ -86,4 +86,4 @@ class Shooter : public frc2::SubsystemBase {
 
 }  // namespace subsystems
 }  // namespace robot
-}  // namespace frc
+}  // namespace wpi

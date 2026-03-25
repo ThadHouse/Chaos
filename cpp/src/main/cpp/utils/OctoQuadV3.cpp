@@ -8,9 +8,9 @@
 #include <iostream>
 #include <vector>
 
-using namespace frc::utils;
+using namespace wpi::utils;
 
-OctoQuadV3::OctoQuadV3(frc::I2C::Port port)
+OctoQuadV3::OctoQuadV3(wpi::I2C::Port port)
     : m_i2c{port, 0x30} {
   uint8_t chipId = GetChipId();
   if (chipId != 0x51) {

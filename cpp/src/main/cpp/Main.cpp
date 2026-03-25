@@ -10,10 +10,10 @@
  * the Robot class template parameter passed to RobotBase::StartRobot.
  */
 
-#include <frc/RobotBase.h>
+#include <wpi/framework/RobotBase.hpp>
 
 #include "robot/Robot.h"
 
 int main() {
-  return frc::RobotBase::StartRobot<frc::robot::Robot>();
+  return wpi::StartRobot<wpi::robot::Robot>();
 }

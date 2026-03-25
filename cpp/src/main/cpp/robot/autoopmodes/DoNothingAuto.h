@@ -4,25 +4,23 @@
 
 #pragma once
 
+#include <wpi/opmode/PeriodicOpMode.hpp>
+
 #include "../Robot.h"
 
-namespace frc {
+namespace wpi {
 namespace robot {
 namespace autoopmodes {
 
 /**
  * Autonomous mode that does nothing except run the robot periodic loop.
- *
- * In the C++ port the robot framework is frc::TimedRobot, so mode selection
- * is handled by Robot::AutonomousInit / AutonomousPeriodic. This class exists
- * as a logical grouping for the "do nothing" auto logic.
  */
-class DoNothingAuto {
+class DoNothingAuto : public wpi::PeriodicOpMode {
  public:
   explicit DoNothingAuto(Robot& robot);
 
-  void DisabledPeriodic();
-  void Periodic();
+  void DisabledPeriodic() override;
+  void Periodic() override;
 
  private:
   Robot& m_robot;
@@ -30,4 +28,4 @@ class DoNothingAuto {
 
 }  // namespace autoopmodes
 }  // namespace robot
-}  // namespace frc
+}  // namespace wpi

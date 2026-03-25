@@ -4,10 +4,10 @@
 
 #include "MainTeleop.h"
 
-#include <frc2/command/CommandScheduler.h>
-#include <frc2/command/button/Trigger.h>
+#include <wpi/commands2/CommandScheduler.hpp>
+#include <wpi/commands2/button/Trigger.hpp>
 
-using namespace frc::robot::teleopmodes;
+using namespace wpi::robot::teleopmodes;
 
 MainTeleop::MainTeleop(Robot& robot)
     : m_robot{robot},
@@ -24,11 +24,11 @@ void MainTeleop::Start() {
   auto& shooter = m_robot.GetShooter();
   auto& gamepad = m_robot.GetDriverGamepad();
 
-  frc2::Trigger rightBumper{[&gamepad] { return gamepad.GetRawButton(6); }};
-  frc2::Trigger leftBumper{[&gamepad] { return gamepad.GetRawButton(5); }};
+  wpi::cmd::Trigger rightBumper{[&gamepad] { return gamepad.GetRawButton(6); }};
+  wpi::cmd::Trigger leftBumper{[&gamepad] { return gamepad.GetRawButton(5); }};
 
-  rightBumper.And(leftBumper).WhileTrue(shooter.GetSpinAndFeedCommand());
-  rightBumper.And(leftBumper.Negate()).WhileTrue(shooter.GetSpinCommand());
+  (rightBumper && leftBumper).WhileTrue(shooter.GetSpinAndFeedCommand());
+  (rightBumper && !leftBumper).WhileTrue(shooter.GetSpinCommand());
 }
 
 void MainTeleop::Periodic() {

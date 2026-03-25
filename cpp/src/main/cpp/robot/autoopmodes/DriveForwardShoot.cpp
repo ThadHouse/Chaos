@@ -4,10 +4,10 @@
 
 #include "DriveForwardShoot.h"
 
-#include <frc2/command/CommandScheduler.h>
-#include <frc2/command/Commands.h>
+#include <wpi/commands2/CommandScheduler.hpp>
+#include <wpi/commands2/Commands.hpp>
 
-using namespace frc::robot::autoopmodes;
+using namespace wpi::robot::autoopmodes;
 
 DriveForwardShoot::DriveForwardShoot(Robot& robot)
     : m_robot{robot},

@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/opmode/PeriodicOpMode.hpp>
 
 #include "../Robot.h"
 
-namespace frc {
+namespace wpi {
 namespace robot {
 namespace teleopmodes {
 
@@ -19,24 +20,21 @@ namespace teleopmodes {
  * - Right stick X: rotation
  * - Right bumper alone: spin shooter at 40 RPM
  * - Right + left bumper: spin and feed
- *
- * In the C++ port, this logic is scheduled from Robot::TeleopInit().
- * This class exists as a logical grouping matching the Java @Teleop opmode.
  */
-class MainTeleop {
+class MainTeleop : public wpi::PeriodicOpMode {
  public:
   explicit MainTeleop(Robot& robot);
 
-  void DisabledPeriodic();
-  void Start();
-  void Periodic();
-  void End();
+  void DisabledPeriodic() override;
+  void Start() override;
+  void Periodic() override;
+  void End() override;
 
  private:
   Robot& m_robot;
-  frc2::CommandPtr m_joystickDriveCommand;
+  wpi::cmd::CommandPtr m_joystickDriveCommand;
 };
 
 }  // namespace teleopmodes
 }  // namespace robot
-}  // namespace frc
+}  // namespace wpi

@@ -4,9 +4,9 @@
 
 #include "SpinShooter.h"
 
-#include <frc2/command/CommandScheduler.h>
+#include <wpi/commands2/CommandScheduler.hpp>
 
-using namespace frc::robot::testopmodes;
+using namespace wpi::robot::testopmodes;
 
 SpinShooter::SpinShooter(Robot& robot)
     : m_robot{robot},

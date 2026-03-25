@@ -7,17 +7,25 @@
 #include <cmath>
 #include <string>
 
-#include <frc2/command/CommandScheduler.h>
-#include <units/time.h>
+#include <wpi/commands2/CommandScheduler.hpp>
+#include <wpi/units/time.hpp>
 
 #include "../Constants.h"
 
-using namespace frc::robot::subsystems;
+using namespace wpi::robot::subsystems;
 
 Shooter::Shooter(Leds& leds) : m_leds{leds} {
   m_shooterMotor.SetReversed(true);
   m_shooterMotor.SetDistancePerCount(ShooterConstants::kEncoderDistancePerPulse);
   m_shooterMotor.SetEnabled(true);
+
+  m_leftFeederServo.SetContinousRotationMode(true);
+  m_rightFeederServo.SetContinousRotationMode(true);
+
+  m_leftFeederServo.SetReversed(true);
+
+  m_leftFeederServo.SetEnabled(true);
+  m_rightFeederServo.SetEnabled(true);
 
   auto& pidConstants = m_shooterMotor.GetVelocityPidConstants();
   pidConstants.SetPID(ShooterConstants::kP, ShooterConstants::kI,
@@ -52,7 +60,7 @@ double Shooter::GetShooterPosition() {
   return m_shooterMotor.GetEncoderPosition();
 }
 
-units::ampere_t Shooter::GetShooterCurrent() {
+wpi::units::ampere_t Shooter::GetShooterCurrent() {
   return m_shooterMotor.GetCurrent();
 }
 
@@ -80,21 +88,21 @@ void Shooter::SetFeed(bool feed) {
   }
 }
 
-frc2::CommandPtr Shooter::GetSpinCommand() {
+wpi::cmd::CommandPtr Shooter::GetSpinCommand() {
   return Run([this] {
            SetSpeed(40);
            SetFeed(false);
          }).WithName("Spin Shooter");
 }
 
-frc2::CommandPtr Shooter::GetSpinAndFeedCommand() {
+wpi::cmd::CommandPtr Shooter::GetSpinAndFeedCommand() {
   return Run([this] {
            SetSpeed(40);
            SetFeed(true);
          }).WithName("Spin and Feed Shooter");
 }
 
-frc2::CommandPtr Shooter::ShootTime(double time) {
+wpi::cmd::CommandPtr Shooter::ShootTime(double time) {
   return RunEnd(
              [this] {
                SetSpeed(40);
@@ -104,6 +112,6 @@ frc2::CommandPtr Shooter::ShootTime(double time) {
                SetSpeed(0);
                SetFeed(false);
              })
-      .WithTimeout(units::second_t{time})
+      .WithTimeout(wpi::units::second_t{time})
       .WithName("Shoot " + std::to_string(time));
 }

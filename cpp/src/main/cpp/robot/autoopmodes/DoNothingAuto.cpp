@@ -4,7 +4,7 @@
 
 #include "DoNothingAuto.h"
 
-using namespace frc::robot::autoopmodes;
+using namespace wpi::robot::autoopmodes;
 
 DoNothingAuto::DoNothingAuto(Robot& robot) : m_robot{robot} {}
 

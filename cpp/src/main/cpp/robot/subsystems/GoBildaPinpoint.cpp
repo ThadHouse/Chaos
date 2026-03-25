@@ -5,16 +5,15 @@
 #include "GoBildaPinpoint.h"
 
 #include <cstring>
+#include <iostream>
 
-#include <frc/DriverStation.h>
-
-using namespace frc::robot::subsystems;
+using namespace wpi::robot::subsystems;
 
 // ---------------------------------------------------------------------------
 // Constructor
 // ---------------------------------------------------------------------------
 
-GoBildaPinpoint::GoBildaPinpoint(frc::I2C::Port port)
+GoBildaPinpoint::GoBildaPinpoint(wpi::I2C::Port port)
     : m_i2c{port, kDefaultAddress} {}
 
 // ---------------------------------------------------------------------------
@@ -43,7 +42,7 @@ void GoBildaPinpoint::WriteInt(Register reg, int32_t i) {
   buffer[4] = static_cast<uint8_t>((i >> 24) & 0xFF);
 
   if (m_i2c.WriteBulk(buffer, 5)) {
-    frc::DriverStation::ReportError("GoBildaPinpoint: Failed to write int register");
+    std::cerr << "GoBildaPinpoint: Failed to write int register" << "\n";
   }
 }
 
@@ -54,14 +53,14 @@ void GoBildaPinpoint::WriteFloat(Register reg, float f) {
   std::memcpy(buffer + 1, &f, sizeof(f));
 
   if (m_i2c.WriteBulk(buffer, 5)) {
-    frc::DriverStation::ReportError("GoBildaPinpoint: Failed to write float register");
+    std::cerr << "GoBildaPinpoint: Failed to write float register" << "\n";
   }
 }
 
 int32_t GoBildaPinpoint::ReadInt(Register reg) {
   uint8_t buffer[4];
   if (m_i2c.Read(static_cast<int>(reg), 4, buffer)) {
-    frc::DriverStation::ReportError("GoBildaPinpoint: Failed to read int register");
+    std::cerr << "GoBildaPinpoint: Failed to read int register" << "\n";
     return 0;
   }
   return ReadInt32LE(buffer, 0);
@@ -70,7 +69,7 @@ int32_t GoBildaPinpoint::ReadInt(Register reg) {
 float GoBildaPinpoint::ReadFloat(Register reg) {
   uint8_t buffer[4];
   if (m_i2c.Read(static_cast<int>(reg), 4, buffer)) {
-    frc::DriverStation::ReportError("GoBildaPinpoint: Failed to read float register");
+    std::cerr << "GoBildaPinpoint: Failed to read float register" << "\n";
     return 0.0f;
   }
   return ReadFloatLE(buffer, 0);
@@ -129,16 +128,15 @@ void GoBildaPinpoint::Update(ReadData data) {
   if (data == ReadData::ONLY_UPDATE_HEADING) {
     uint8_t buffer[4];
     if (m_i2c.Read(static_cast<int>(Register::H_ORIENTATION), 4, buffer)) {
-      frc::DriverStation::ReportError(
-          "GoBildaPinpoint: Failed to read heading register");
+      std::cerr << "GoBildaPinpoint: Failed to read heading register" << "\n";
       return;
     }
     m_hOrientation = ReadFloatLE(buffer, 0);
   }
 }
 
-void GoBildaPinpoint::SetOffsets(units::millimeter_t xOffset,
-                                  units::millimeter_t yOffset) {
+void GoBildaPinpoint::SetOffsets(wpi::units::millimeter_t xOffset,
+                                  wpi::units::millimeter_t yOffset) {
   WriteFloat(Register::X_POD_OFFSET, static_cast<float>(xOffset.value()));
   WriteFloat(Register::Y_POD_OFFSET, static_cast<float>(yOffset.value()));
 }
@@ -184,11 +182,11 @@ void GoBildaPinpoint::SetYawScalar(double yawOffset) {
   WriteFloat(Register::YAW_SCALAR, static_cast<float>(yawOffset));
 }
 
-frc::Pose2d GoBildaPinpoint::SetPosition(const frc::Pose2d& pos) {
+wpi::math::Pose2d GoBildaPinpoint::SetPosition(const wpi::math::Pose2d& pos) {
   WriteFloat(Register::X_POSITION,
-             static_cast<float>(units::millimeter_t{pos.X()}.value()));
+             static_cast<float>(wpi::units::millimeter_t{pos.X()}.value()));
   WriteFloat(Register::Y_POSITION,
-             static_cast<float>(units::millimeter_t{pos.Y()}.value()));
+             static_cast<float>(wpi::units::millimeter_t{pos.Y()}.value()));
   WriteFloat(Register::H_ORIENTATION,
              static_cast<float>(pos.Rotation().Radians().value()));
   return pos;
@@ -229,39 +227,39 @@ int32_t GoBildaPinpoint::GetEncoderY() {
   return m_yEncoderValue;
 }
 
-units::millimeter_t GoBildaPinpoint::GetPosX() {
-  return units::millimeter_t{m_xPosition};
+wpi::units::millimeter_t GoBildaPinpoint::GetPosX() {
+  return wpi::units::millimeter_t{m_xPosition};
 }
 
-units::millimeter_t GoBildaPinpoint::GetPosY() {
-  return units::millimeter_t{m_yPosition};
+wpi::units::millimeter_t GoBildaPinpoint::GetPosY() {
+  return wpi::units::millimeter_t{m_yPosition};
 }
 
-frc::Rotation2d GoBildaPinpoint::GetHeading() {
-  return frc::Rotation2d{units::radian_t{m_hOrientation}};
+wpi::math::Rotation2d GoBildaPinpoint::GetHeading() {
+  return wpi::math::Rotation2d{wpi::units::radian_t{m_hOrientation}};
 }
 
-units::meters_per_second_t GoBildaPinpoint::GetVelX() {
-  return units::meters_per_second_t{m_xVelocity / 1000.0};
+wpi::units::meters_per_second_t GoBildaPinpoint::GetVelX() {
+  return wpi::units::meters_per_second_t{m_xVelocity / 1000.0};
 }
 
-units::meters_per_second_t GoBildaPinpoint::GetVelY() {
-  return units::meters_per_second_t{m_yVelocity / 1000.0};
+wpi::units::meters_per_second_t GoBildaPinpoint::GetVelY() {
+  return wpi::units::meters_per_second_t{m_yVelocity / 1000.0};
 }
 
-units::radians_per_second_t GoBildaPinpoint::GetHeadingVelocity() {
-  return units::radians_per_second_t{m_hVelocity};
+wpi::units::radians_per_second_t GoBildaPinpoint::GetHeadingVelocity() {
+  return wpi::units::radians_per_second_t{m_hVelocity};
 }
 
-units::millimeter_t GoBildaPinpoint::GetXOffset() {
-  return units::millimeter_t{ReadFloat(Register::X_POD_OFFSET)};
+wpi::units::millimeter_t GoBildaPinpoint::GetXOffset() {
+  return wpi::units::millimeter_t{ReadFloat(Register::X_POD_OFFSET)};
 }
 
-units::millimeter_t GoBildaPinpoint::GetYOffset() {
-  return units::millimeter_t{ReadFloat(Register::Y_POD_OFFSET)};
+wpi::units::millimeter_t GoBildaPinpoint::GetYOffset() {
+  return wpi::units::millimeter_t{ReadFloat(Register::Y_POD_OFFSET)};
 }
 
-frc::Pose2d GoBildaPinpoint::GetPosition() {
-  return frc::Pose2d{units::meter_t{GetPosX()}, units::meter_t{GetPosY()},
+wpi::math::Pose2d GoBildaPinpoint::GetPosition() {
+  return wpi::math::Pose2d{wpi::units::meter_t{GetPosX()}, wpi::units::meter_t{GetPosY()},
                      GetHeading()};
 }

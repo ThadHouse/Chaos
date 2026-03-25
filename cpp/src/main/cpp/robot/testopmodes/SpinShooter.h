@@ -4,34 +4,32 @@
 
 #pragma once
 
-#include <frc2/command/CommandPtr.h>
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/opmode/PeriodicOpMode.hpp>
 
 #include "../Robot.h"
 
-namespace frc {
+namespace wpi {
 namespace robot {
 namespace testopmodes {
 
 /**
  * Test mode: continuously spins the shooter at 40 rot/s.
- *
- * In the C++ port, this logic is scheduled from Robot::TestInit().
- * This class exists as a logical grouping matching the Java @TestOpMode opmode.
  */
-class SpinShooter {
+class SpinShooter : public wpi::PeriodicOpMode {
  public:
   explicit SpinShooter(Robot& robot);
 
-  void DisabledPeriodic();
-  void Start();
-  void Periodic();
-  void End();
+  void DisabledPeriodic() override;
+  void Start() override;
+  void Periodic() override;
+  void End() override;
 
  private:
   Robot& m_robot;
-  frc2::CommandPtr m_spinCommand;
+  wpi::cmd::CommandPtr m_spinCommand;
 };
 
 }  // namespace testopmodes
 }  // namespace robot
-}  // namespace frc
+}  // namespace wpi

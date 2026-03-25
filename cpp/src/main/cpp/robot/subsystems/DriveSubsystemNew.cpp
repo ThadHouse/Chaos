@@ -6,19 +6,20 @@
 
 #include <string>
 
-#include <frc/Timer.h>
-#include <frc/kinematics/ChassisSpeeds.h>
-#include <units/time.h>
+#include <wpi/math/kinematics/ChassisVelocities.hpp>
+#include <wpi/system/Timer.hpp>
+#include <wpi/units/time.hpp>
 
 #include "../Constants.h"
 
-using namespace frc::robot::subsystems;
+using namespace wpi::robot::subsystems;
+using namespace wpi::units::literals;
 
 // ---------------------------------------------------------------------------
 // Private helper
 // ---------------------------------------------------------------------------
 
-void DriveSubsystemNew::SetPids(frc::robot::hardware::ExpansionHubMotor& motor) {
+void DriveSubsystemNew::SetPids(wpi::ExpansionHubMotor& motor) {
   motor.SetDistancePerCount(DriveConstants::kEncoderDistancePerPulse);
 
   auto& pidConstants = motor.GetVelocityPidConstants();
@@ -52,11 +53,11 @@ DriveSubsystemNew::DriveSubsystemNew() {
   SetPids(m_rearLeftMotor);
   SetPids(m_rearRightMotor);
 
-  frc::Wait(0.5_s);
+  wpi::Wait(0.5_s);
 
   m_pinpoint.Update();
 
-  frc::MecanumDriveWheelSpeeds zeroSpeeds{};
+  wpi::math::MecanumDriveWheelVelocities zeroSpeeds{};
   SetDefaultCommand(
       Run([this, zeroSpeeds] { SetSpeeds(zeroSpeeds); }).WithName("Drive Default"));
 }
@@ -69,19 +70,19 @@ void DriveSubsystemNew::Periodic() {
   m_pinpoint.Update();
 }
 
-units::ampere_t DriveSubsystemNew::GetFrontLeftCurrent() {
+wpi::units::ampere_t DriveSubsystemNew::GetFrontLeftCurrent() {
   return m_frontLeftMotor.GetCurrent();
 }
 
-units::ampere_t DriveSubsystemNew::GetFrontRightCurrent() {
+wpi::units::ampere_t DriveSubsystemNew::GetFrontRightCurrent() {
   return m_frontRightMotor.GetCurrent();
 }
 
-units::ampere_t DriveSubsystemNew::GetRearLeftCurrent() {
+wpi::units::ampere_t DriveSubsystemNew::GetRearLeftCurrent() {
   return m_rearLeftMotor.GetCurrent();
 }
 
-units::ampere_t DriveSubsystemNew::GetRearRightCurrent() {
+wpi::units::ampere_t DriveSubsystemNew::GetRearRightCurrent() {
   return m_rearRightMotor.GetCurrent();
 }
 
@@ -89,34 +90,33 @@ bool DriveSubsystemNew::IsHubConnected() {
   return m_frontLeftMotor.IsHubConnected();
 }
 
-frc::Pose2d DriveSubsystemNew::GetPose() {
+wpi::math::Pose2d DriveSubsystemNew::GetPose() {
   return m_pinpoint.GetPosition();
 }
 
-void DriveSubsystemNew::ResetOdometry(const frc::Pose2d& pose) {
+void DriveSubsystemNew::ResetOdometry(const wpi::math::Pose2d& pose) {
   m_pinpoint.SetPosition(pose);
 }
 
-void DriveSubsystemNew::SetSpeeds(const frc::MecanumDriveWheelSpeeds& speeds) {
+void DriveSubsystemNew::SetSpeeds(const wpi::math::MecanumDriveWheelVelocities& speeds) {
   m_frontLeftMotor.SetVelocitySetpoint(speeds.frontLeft.value());
   m_frontRightMotor.SetVelocitySetpoint(speeds.frontRight.value());
   m_rearLeftMotor.SetVelocitySetpoint(speeds.rearLeft.value());
   m_rearRightMotor.SetVelocitySetpoint(speeds.rearRight.value());
 }
 
-void DriveSubsystemNew::Drive(units::meters_per_second_t xSpeed,
-                               units::meters_per_second_t ySpeed,
-                               units::radians_per_second_t rot,
+void DriveSubsystemNew::Drive(wpi::units::meters_per_second_t xSpeed,
+                               wpi::units::meters_per_second_t ySpeed,
+                               wpi::units::radians_per_second_t rot,
                                bool fieldRelative) {
-  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+  wpi::math::ChassisVelocities chassisVelocities{xSpeed, ySpeed, rot};
   if (fieldRelative) {
-    chassisSpeeds =
-        frc::ChassisSpeeds::FromFieldRelativeSpeeds(chassisSpeeds, GetHeading());
+    chassisVelocities = chassisVelocities.ToRobotRelative(GetHeading());
   }
-  chassisSpeeds = frc::ChassisSpeeds::Discretize(chassisSpeeds, 0.02_s);
+  chassisVelocities = chassisVelocities.Discretize(0.02_s);
   auto mecanumStates =
-      DriveConstants::kDriveKinematics.ToWheelSpeeds(chassisSpeeds);
-  mecanumStates.Desaturate(DriveConstants::kMaxWheelSpeed);
+      DriveConstants::kDriveKinematics.ToWheelVelocities(chassisVelocities);
+  mecanumStates = mecanumStates.Desaturate(DriveConstants::kMaxWheelSpeed);
   SetSpeeds(mecanumStates);
 }
 
@@ -129,42 +129,42 @@ void DriveSubsystemNew::DriveJoysticks(double xSpeed, double ySpeed, double rot,
   Drive(xSpeedDelivered, ySpeedDelivered, rotDelivered, fieldRelative);
 }
 
-frc::MecanumDriveWheelSpeeds DriveSubsystemNew::GetCurrentWheelSpeeds() {
-  return frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t{m_frontLeftMotor.GetEncoderVelocity()},
-      units::meters_per_second_t{m_frontRightMotor.GetEncoderVelocity()},
-      units::meters_per_second_t{m_rearLeftMotor.GetEncoderVelocity()},
-      units::meters_per_second_t{m_rearRightMotor.GetEncoderVelocity()}};
+wpi::math::MecanumDriveWheelVelocities DriveSubsystemNew::GetCurrentWheelSpeeds() {
+  return wpi::math::MecanumDriveWheelVelocities{
+      wpi::units::meters_per_second_t{m_frontLeftMotor.GetEncoderVelocity()},
+      wpi::units::meters_per_second_t{m_frontRightMotor.GetEncoderVelocity()},
+      wpi::units::meters_per_second_t{m_rearLeftMotor.GetEncoderVelocity()},
+      wpi::units::meters_per_second_t{m_rearRightMotor.GetEncoderVelocity()}};
 }
 
-frc::MecanumDriveWheelPositions DriveSubsystemNew::GetCurrentWheelDistances() {
-  return frc::MecanumDriveWheelPositions{
-      units::meter_t{m_frontLeftMotor.GetEncoderPosition()},
-      units::meter_t{m_frontRightMotor.GetEncoderPosition()},
-      units::meter_t{m_rearLeftMotor.GetEncoderPosition()},
-      units::meter_t{m_rearRightMotor.GetEncoderPosition()}};
+wpi::math::MecanumDriveWheelPositions DriveSubsystemNew::GetCurrentWheelDistances() {
+  return wpi::math::MecanumDriveWheelPositions{
+      wpi::units::meter_t{m_frontLeftMotor.GetEncoderPosition()},
+      wpi::units::meter_t{m_frontRightMotor.GetEncoderPosition()},
+      wpi::units::meter_t{m_rearLeftMotor.GetEncoderPosition()},
+      wpi::units::meter_t{m_rearRightMotor.GetEncoderPosition()}};
 }
 
-units::radians_per_second_t DriveSubsystemNew::GetTurnRate() {
+wpi::units::radians_per_second_t DriveSubsystemNew::GetTurnRate() {
   return m_pinpoint.GetHeadingVelocity();
 }
 
-frc::Rotation2d DriveSubsystemNew::GetHeading() {
+wpi::math::Rotation2d DriveSubsystemNew::GetHeading() {
   return m_pinpoint.GetHeading();
 }
 
-frc2::CommandPtr DriveSubsystemNew::GetJoystickDriveCommand(
-    frc::GenericHID& gamepad) {
+wpi::cmd::CommandPtr DriveSubsystemNew::GetJoystickDriveCommand(
+    wpi::GenericHID& gamepad) {
   return Run([this, &gamepad] {
            DriveJoysticks(-gamepad.GetRawAxis(1), -gamepad.GetRawAxis(0),
                           -gamepad.GetRawAxis(4), true);
          }).WithName("Joystick Drive");
 }
 
-frc2::CommandPtr DriveSubsystemNew::DriveForwardTime(double time) {
+wpi::cmd::CommandPtr DriveSubsystemNew::DriveForwardTime(double time) {
   return RunEnd(
              [this] { DriveJoysticks(0.0, 1.0, 0.0, true); },
              [this] { DriveJoysticks(0.0, 0.0, 0.0, true); })
-      .WithTimeout(units::second_t{time})
+      .WithTimeout(wpi::units::second_t{time})
       .WithName("Drive Forward " + std::to_string(time));
 }

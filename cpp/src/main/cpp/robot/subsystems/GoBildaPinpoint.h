@@ -7,15 +7,15 @@
 #include <cstdint>
 #include <string>
 
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
-#include <frc/I2C.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/velocity.h>
+#include <wpi/hardware/bus/I2C.hpp>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
+#include <wpi/units/angle.hpp>
+#include <wpi/units/angular_velocity.hpp>
+#include <wpi/units/length.hpp>
+#include <wpi/units/velocity.hpp>
 
-namespace frc {
+namespace wpi {
 namespace robot {
 namespace subsystems {
 
@@ -76,7 +76,7 @@ class GoBildaPinpoint {
   /** Narrow-scope read options */
   enum class ReadData { ONLY_UPDATE_HEADING };
 
-  explicit GoBildaPinpoint(frc::I2C::Port port);
+  explicit GoBildaPinpoint(wpi::I2C::Port port);
 
   /**
    * Call once per loop to read new data from the Odometry Computer.
@@ -98,7 +98,7 @@ class GoBildaPinpoint {
    * @param yOffset How far forward (mm) the Y (strafe) pod is from center.
    *                Forward is positive.
    */
-  void SetOffsets(units::millimeter_t xOffset, units::millimeter_t yOffset);
+  void SetOffsets(wpi::units::millimeter_t xOffset, wpi::units::millimeter_t yOffset);
 
   /** Recalibrates the internal IMU. Robot MUST be stationary. */
   void RecalibrateIMU();
@@ -145,7 +145,7 @@ class GoBildaPinpoint {
    * @param pos New robot pose.
    * @return The pose that was set.
    */
-  frc::Pose2d SetPosition(const frc::Pose2d& pos);
+  wpi::math::Pose2d SetPosition(const wpi::math::Pose2d& pos);
 
   /** @return Device ID (should be 1 if functional). */
   int32_t GetDeviceID();
@@ -172,34 +172,34 @@ class GoBildaPinpoint {
   int32_t GetEncoderY();
 
   /** @return Estimated X (forward) position. */
-  units::millimeter_t GetPosX();
+  wpi::units::millimeter_t GetPosX();
 
   /** @return Estimated Y (strafe) position. */
-  units::millimeter_t GetPosY();
+  wpi::units::millimeter_t GetPosY();
 
   /** @return Estimated heading. */
-  frc::Rotation2d GetHeading();
+  wpi::math::Rotation2d GetHeading();
 
   /** @return Estimated X velocity. */
-  units::meters_per_second_t GetVelX();
+  wpi::units::meters_per_second_t GetVelX();
 
   /** @return Estimated Y velocity. */
-  units::meters_per_second_t GetVelY();
+  wpi::units::meters_per_second_t GetVelY();
 
   /** @return Estimated heading angular velocity. */
-  units::radians_per_second_t GetHeadingVelocity();
+  wpi::units::radians_per_second_t GetHeadingVelocity();
 
   /** @return X pod offset (separate I2C read — avoid calling every loop). */
-  units::millimeter_t GetXOffset();
+  wpi::units::millimeter_t GetXOffset();
 
   /** @return Y pod offset (separate I2C read — avoid calling every loop). */
-  units::millimeter_t GetYOffset();
+  wpi::units::millimeter_t GetYOffset();
 
   /** @return Current estimated pose. */
-  frc::Pose2d GetPosition();
+  wpi::math::Pose2d GetPosition();
 
  private:
-  frc::I2C m_i2c;
+  wpi::I2C m_i2c;
 
   int32_t m_deviceStatus = 0;
   int32_t m_loopTime = 0;
@@ -226,4 +226,4 @@ class GoBildaPinpoint {
 
 }  // namespace subsystems
 }  // namespace robot
-}  // namespace frc
+}  // namespace wpi

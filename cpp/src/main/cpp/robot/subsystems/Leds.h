@@ -6,9 +6,9 @@
 
 #include <vector>
 
-#include <frc/AddressableLED.h>
+#include <wpi/hardware/led/AddressableLED.hpp>
 
-namespace frc {
+namespace wpi {
 namespace robot {
 namespace subsystems {
 
@@ -35,12 +35,12 @@ class Leds {
   static constexpr int kLedPort = 3;
   static constexpr int kLedCount = 30;
 
-  frc::AddressableLED m_led{kLedPort};
-  std::vector<frc::AddressableLED::LEDData> m_allRed;
-  std::vector<frc::AddressableLED::LEDData> m_allGreen;
-  std::vector<frc::AddressableLED::LEDData> m_allBlue;
+  wpi::AddressableLED m_led{kLedPort};
+  std::vector<wpi::AddressableLED::LEDData> m_allRed;
+  std::vector<wpi::AddressableLED::LEDData> m_allGreen;
+  std::vector<wpi::AddressableLED::LEDData> m_allBlue;
 };
 
 }  // namespace subsystems
 }  // namespace robot
-}  // namespace frc
+}  // namespace wpi
