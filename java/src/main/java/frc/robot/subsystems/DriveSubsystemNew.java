@@ -15,9 +15,9 @@ import org.wpilib.hardware.bus.I2C.Port;
 import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
-import org.wpilib.math.kinematics.MecanumDriveWheelSpeeds;
+import org.wpilib.math.kinematics.MecanumDriveWheelVelocities;
 import org.wpilib.system.Timer;
 import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.Current;
@@ -70,10 +70,10 @@ public class DriveSubsystemNew extends Mechanism {
 
     Scheduler.getDefault().addPeriodic(this::periodic);
 
-    var zeroSpeeds = new MecanumDriveWheelSpeeds();
+    var zeroSpeeds = new MecanumDriveWheelVelocities();
 
     this.setDefaultCommand(this.runRepeatedly(() -> {
-      this.setSpeeds(zeroSpeeds);
+      this.setVelocities(zeroSpeeds);
     }).withPriority(Command.LOWEST_PRIORITY).named("Drive Default"));
   }
 
@@ -110,7 +110,7 @@ public class DriveSubsystemNew extends Mechanism {
     m_pinpoint.setPosition(pose);
   }
 
-  public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
+  public void setVelocities(MecanumDriveWheelVelocities speeds) {
 
     m_frontLeftMotor.setVelocitySetpoint(speeds.frontLeft);
     m_frontRightMotor.setVelocitySetpoint(speeds.frontRight);
@@ -132,14 +132,14 @@ public class DriveSubsystemNew extends Mechanism {
    */
   public void drive(LinearVelocity xSpeed, LinearVelocity ySpeed, AngularVelocity rot, boolean fieldRelative) {
 
-    var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
+    var chassisSpeeds = new ChassisVelocities(xSpeed, ySpeed, rot);
     if (fieldRelative) {
       chassisSpeeds = chassisSpeeds.toRobotRelative(getHeading());
     }
     chassisSpeeds = chassisSpeeds.discretize(0.02);
-    var mecanumStates = DriveConstants.kDriveKinematics.toWheelSpeeds(chassisSpeeds);
+    var mecanumStates = DriveConstants.kDriveKinematics.toWheelVelocities(chassisSpeeds);
     mecanumStates = mecanumStates.desaturate(DriveConstants.kMaxWheelSpeed);
-    setSpeeds(mecanumStates);
+    setVelocities(mecanumStates);
   }
 
   public void driveJoysticks(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
@@ -155,8 +155,8 @@ public class DriveSubsystemNew extends Mechanism {
    *
    * @return the current wheel speeds in a MecanumDriveWheelSpeeds object.
    */
-  public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
-    return new MecanumDriveWheelSpeeds(
+  public MecanumDriveWheelVelocities getCurrentWheelSpeeds() {
+    return new MecanumDriveWheelVelocities(
         m_frontLeftMotor.getEncoderVelocity(),
         m_frontRightMotor.getEncoderVelocity(),
         m_rearLeftMotor.getEncoderVelocity(),
